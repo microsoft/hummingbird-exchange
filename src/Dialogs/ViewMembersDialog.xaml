@@ -1,0 +1,20 @@
+﻿<mui:ModernDialog x:Class="Hummingbird.Dialogs.ViewMembersDialog"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+                  mc:Ignorable="d" Height="400" Width="500"
+                  DataContext="{Binding Instance,Source={StaticResource DlGroupMigrationViewModel}}"
+                  d:DesignHeight="300" d:DesignWidth="300"
+                  Title="View Members">
+
+    <!-- Note: ModernDialog buttons are defined in the constructor of the code behind class -->
+    <Grid Height="320" Width="450" HorizontalAlignment="Left" Style="{StaticResource ContentRoot}">
+        <DataGrid SelectionMode="Single" Width="450" Name="CoreGrid" HorizontalAlignment="Left" ItemsSource="{Binding CurrentlyActiveDl.Members,Mode=TwoWay}" AutoGenerateColumns="False" >
+            <DataGrid.Columns>
+                <mui:DataGridTextColumn SortDirection="Ascending" CanUserSort="True"  Header="Email Address"  Binding="{Binding}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</mui:ModernDialog>

@@ -1,0 +1,14 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Header>
+    <RequestServerVersion Version="Exchange2015" xmlns="http://schemas.microsoft.com/exchange/services/2006/types"/>
+    <MailboxCulture xmlns="http://schemas.microsoft.com/exchange/services/2006/types">en-US</MailboxCulture>
+  </s:Header>
+  <s:Body>
+    <RemoveUnifiedGroup xmlns="http://schemas.microsoft.com/exchange/services/2006/messages">
+      <GroupIdentity xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
+        <Type>SmtpAddress</Type>
+        <Value>TEST</Value>
+      </GroupIdentity>
+    </RemoveUnifiedGroup>
+  </s:Body>
+</s:Envelope>

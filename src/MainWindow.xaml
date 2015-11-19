@@ -1,0 +1,26 @@
+﻿<mui:ModernWindow x:Class="Hummingbird.MainWindow"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI" Title="HUMMINGBIRD" IsTitleVisible="True"
+                  ContentSource="/Pages/DLGroupMigrationMain.xaml"
+                  Width="800" Height="750" MaxHeight="750" MaxWidth="800" MinHeight="750" MinWidth="800"
+                  LogoData="F1 M 27.4993,3.06409C 27.5523,2.9364 27.2543,2.42572 26.6053,1.53204C 25.9562,0.638367 24.6382,0.127686 22.651,0C 21.271,-0.0405273 19.8227,0.453918 18.3063,1.48334C 16.7899,2.51279 15.9681,4.3204 15.8409,6.90622C 15.703,6.89325 15.0549,7.26727 13.8969,8.02829C 12.7388,8.78934 11.8987,10.0154 11.3767,11.7065C 10.9106,13.5896 10.1506,15.0197 9.09656,15.9968C 8.04248,16.9738 6.89841,17.5759 5.66434,17.8029C 4.42026,17.9969 3.1882,17.9929 1.96811,17.7909C 0.748047,17.5889 0.0920105,17.4649 0,17.4189C -0.0810242,17.6349 0.464996,18.4989 1.63809,20.011C 2.81116,21.5231 5.09729,22.3872 8.49649,22.6032C 8.40649,22.6582 7.98648,23.1122 7.23642,23.9653C 6.48636,24.8183 5.94632,25.7404 5.61633,26.7314C 5.45132,27.4775 5.73337,28.0135 6.4624,28.3395C 7.19144,28.6656 8.4935,28.0495 10.3686,26.4914C 10.3066,26.6434 10.3346,27.2275 10.4526,28.2435C 10.5706,29.2596 11.1507,29.7956 12.1927,29.8516C 13.2158,29.7826 13.9178,29.3566 14.2989,28.5735C 14.6799,27.7905 14.6499,26.4884 14.2089,24.6673C 14.1908,24.6413 14.2148,24.5613 14.2809,24.4273C 14.3468,24.2933 14.5629,24.2613 14.9289,24.3313C 15.4063,24.6313 16.6204,24.7993 18.5714,24.8353C 20.5224,24.8713 22.6503,23.6953 24.9552,21.3071C 26.6923,18.9709 27.4783,16.8028 27.3133,14.8027C 27.1483,12.8026 26.9863,11.7385 26.8273,11.6105C 26.9403,11.6165 27.3383,11.2565 28.0214,10.5305C 28.7044,9.80438 28.9944,8.67633 28.8914,7.14624L 33.9797,3.88205L 33.9797,3.06409L 27.4993,3.06409 Z M 21.451,5.13013C 21.465,4.58807 21.653,4.13605 22.015,3.77405C 22.377,3.41199 22.8291,3.224 23.3711,3.21002C 23.9404,3.224 24.4072,3.41202 24.7714,3.77405C 25.1355,4.13605 25.3237,4.58807 25.336,5.13013C 25.3222,5.67215 25.1371,6.12418 24.7807,6.48621C 24.4243,6.84821 23.9794,7.03622 23.4459,7.05023C 22.9124,7.03625 22.4674,6.84824 22.1111,6.48621C 21.7548,6.12418 21.5697,5.67215 21.5559,5.13013L 21.451,5.13013 Z">
+
+    <mui:ModernWindow.TitleLinks>
+        <mui:Link DisplayName="Settings" Source="/Pages/SettingsMain.xaml"/>
+    </mui:ModernWindow.TitleLinks>
+
+    <mui:ModernWindow.MenuLinkGroups>
+        <mui:LinkGroup DisplayName="MIGRATION">
+            <mui:LinkGroup.Links>
+                <mui:Link DisplayName="Distribution List" Source="/Pages/DLGroupMigrationMain.xaml" />
+                <mui:Link DisplayName="Bulk Add" Source="/Pages/BulkAddMain.xaml" />
+            </mui:LinkGroup.Links>
+        </mui:LinkGroup>
+        <mui:LinkGroup DisplayName="Settings" GroupKey="settings">
+            <mui:LinkGroup.Links>
+                <mui:Link DisplayName="USER" Source="/Pages/SettingsMain.xaml" />
+            </mui:LinkGroup.Links>
+        </mui:LinkGroup>
+    </mui:ModernWindow.MenuLinkGroups>
+</mui:ModernWindow>

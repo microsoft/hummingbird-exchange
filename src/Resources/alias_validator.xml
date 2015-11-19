@@ -1,0 +1,1 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Header><RequestServerVersion Version="Exchange2015" xmlns="http://schemas.microsoft.com/exchange/services/2006/types"/></s:Header><s:Body><ValidateUnifiedGroupAlias xmlns="http://schemas.microsoft.com/exchange/services/2006/messages"><Alias>##GROUPID##</Alias></ValidateUnifiedGroupAlias></s:Body></s:Envelope>

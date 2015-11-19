@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B5CD7BDA-49BF-42EC-8AB0-FF4C7349F1D4}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Hummingbird</RootNamespace>
+    <AssemblyName>Hummingbird</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>\\hxshare\public\dendeli\deploydepot\Hummingbird\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Unc</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>publish.htm</WebPage>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>1427799497_61706.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>81C1B429C2BCC984AE145A1F527A9111DD32C97F</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>Hummingbird_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FirstFloor.ModernUI">
+      <HintPath>..\packages\ModernUI.WPF.1.0.6\lib\net45\FirstFloor.ModernUI.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Exchange.WebServices, Version=15.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Exchange.WebServices.2.2\lib\40\Microsoft.Exchange.WebServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Exchange.WebServices.Auth">
+      <HintPath>..\packages\Microsoft.Exchange.WebServices.2.2\lib\40\Microsoft.Exchange.WebServices.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common">
+      <HintPath>..\packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Logging">
+      <HintPath>..\packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45\Microsoft.Practices.EnterpriseLibrary.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.DirectoryServices.Protocols" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\System.Management.Automation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Management.Instrumentation" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Core\AppSetup.cs" />
+    <Compile Include="Core\Common\FileSystemOperator.cs" />
+    <Compile Include="Core\Common\GroupSimplifier.cs" />
+    <Compile Include="Core\Converters\AliasValidToImageConverter.cs" />
+    <Compile Include="Core\Converters\InverseBooleanConverter.cs" />
+    <Compile Include="Core\Converters\InverseBooleanToVisibilityConverter.cs" />
+    <Compile Include="Core\CredentialManager.cs" />
+    <Compile Include="Core\ExchangeConnector.cs" />
+    <Compile Include="Core\ExchangeRequestType.cs" />
+    <Compile Include="Core\Internal\ActiveDirectoryConnector.cs" />
+    <Compile Include="Core\SettingsManager.cs" />
+    <Compile Include="Dialogs\ViewMembersDialog.xaml.cs">
+      <DependentUpon>ViewMembersDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Interfaces\IExchangeResponse.cs" />
+    <Compile Include="Models\DistributionList.cs" />
+    <Compile Include="Models\EnvelopeAtoms\GetUnifiedGroupMembersResponseMessageMembersInfo.cs" />
+    <Compile Include="Models\EnvelopeAtoms\GetUnifiedGroupResponse.cs" />
+    <Compile Include="Models\EnvelopeAtoms\GetUnifiedGroupResponseBody.cs" />
+    <Compile Include="Models\EnvelopeAtoms\GroupCreationResponse.cs" />
+    <Compile Include="Models\EnvelopeAtoms\GroupCreationResponseBody.cs" />
+    <Compile Include="Models\EnvelopeAtoms\GroupIdentity.cs" />
+    <Compile Include="Models\EnvelopeAtoms\Member.cs" />
+    <Compile Include="Models\EnvelopeAtoms\MemberPersona.cs" />
+    <Compile Include="Models\EnvelopeAtoms\MemberPersonaEmail.cs" />
+    <Compile Include="Models\EnvelopeAtoms\MemberPersonaId.cs" />
+    <Compile Include="Models\EnvelopeAtoms\SetUnifiedGroupMembership.cs" />
+    <Compile Include="Models\EnvelopeAtoms\SetUnifiedGroupMembershipBody.cs" />
+    <Compile Include="Models\EnvelopeAtoms\UnifiedGroupAliasResponse.cs" />
+    <Compile Include="Models\EnvelopeAtoms\UnifiedGroupAliasResponseBody.cs" />
+    <Compile Include="Models\EnvelopeAtoms\UnifiedGroupMembershipState.cs" />
+    <Compile Include="Models\EnvelopeAtoms\UnifiedGroupMembershipStateBody.cs" />
+    <Compile Include="Models\Envelopes\AddMemberEnvelope.cs" />
+    <Compile Include="Models\Envelopes\AliasValidationEnvelope.cs" />
+    <Compile Include="Models\Envelopes\EnteredMemberEnvelope.cs" />
+    <Compile Include="Models\Envelopes\GetUnifiedGroupEnvelope.cs" />
+    <Compile Include="Models\Envelopes\GroupCreationEnvelope.cs" />
+    <Compile Include="Models\Envelopes\SetMemberEnvelope.cs" />
+    <Compile Include="Models\Header.cs" />
+    <Compile Include="Models\RequestHeader.cs" />
+    <Compile Include="Models\RequestServerVersion.cs" />
+    <Compile Include="Models\ServerVersionInfo.cs" />
+    <Compile Include="Models\UserCredentials.cs" />
+    <Compile Include="Pages\AboutPageMain.xaml.cs">
+      <DependentUpon>AboutPageMain.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AccountPageMain.xaml.cs">
+      <DependentUpon>AccountPageMain.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\BulkAddMain.xaml.cs">
+      <DependentUpon>BulkAddMain.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\SettingsMain.xaml.cs">
+      <DependentUpon>SettingsMain.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\AccountSettingsViewModel.cs" />
+    <Compile Include="ViewModels\DLGroupMigrationViewModel.cs" />
+    <Compile Include="ViewModels\LoggingViewModel.cs" />
+    <Page Include="Dialogs\ViewMembersDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Pages\DLGroupMigrationMain.xaml.cs">
+      <DependentUpon>DLGroupMigrationMain.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Page Include="Pages\AboutPageMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AccountPageMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\BulkAddMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\DLGroupMigrationMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\SettingsMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Hummingbird_TemporaryKey.pfx" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\alias_validator.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Checkmark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Deny.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="1427799497_61706.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Checkmark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Deny.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\DeleteGroupPOST.xml" />
+    <None Include="Resources\gug2.xml" />
+    <None Include="Resources\gug1.xml" />
+    <None Include="Resources\SetUnifiedGroupMembersPOST.xml" />
+    <None Include="Resources\gug.xml" />
+    <None Include="Resources\group_create.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

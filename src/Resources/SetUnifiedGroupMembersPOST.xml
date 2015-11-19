@@ -1,0 +1,16 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Header>
+    <RequestServerVersion Version="Exchange2015" xmlns="http://schemas.microsoft.com/exchange/services/2006/types"/>
+  </s:Header>
+  <s:Body>
+    <SetUnifiedGroupMembershipState xmlns="http://schemas.microsoft.com/exchange/services/2006/messages">
+      <GroupIdentity xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
+        <Type>SmtpAddress</Type>
+        <Value>##GROUP_SMTP_ADDRESS##</Value>
+      </GroupIdentity>
+      <Members>
+      </Members>
+      <Action xmlns="http://schemas.microsoft.com/exchange/services/2006/types">Add</Action>
+    </SetUnifiedGroupMembershipState>
+  </s:Body>
+</s:Envelope>

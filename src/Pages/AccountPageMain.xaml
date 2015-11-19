@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="Hummingbird.Pages.AccountPageMain"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" DataContext="{Binding Instance,Source={StaticResource AccountSettingsViewModel}}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Style="{StaticResource ContentRoot}">
+        <StackPanel>
+            <StackPanel>
+                <TextBlock Text="CREDENTIALS" Style="{StaticResource Heading2}" Margin="0,0,0,8"/>
+                <TextBlock Style="{StaticResource Title}" Text="username"></TextBlock>
+                <TextBox x:Name="TxtUsername" Width="200" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                <TextBlock Style="{StaticResource Title}" Text="password"></TextBlock>
+                <PasswordBox x:Name="TxtPassword" Width="200" HorizontalAlignment="Left" Margin="0,0,0,32"/>
+                <Button x:Name="BtnSaveCredentials" Click="btnSaveCredentials_Click" Content="save credentials" Width="180" HorizontalAlignment="Left" Margin="0,0,0,8" />
+            </StackPanel>
+            
+            <StackPanel Margin="0,16,0,0">
+                <TextBlock Text="SERVER" Style="{StaticResource Heading2}" Margin="0,0,0,8"/>
+                <TextBlock Style="{StaticResource Title}" Text="url"></TextBlock>
+                <TextBox Text="{Binding ServerUrl,Mode=TwoWay}" Width="200" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                <TextBlock Style="{StaticResource Title}" Text="target"></TextBlock>
+                <RadioButton Content="active directory" IsChecked="{Binding IsInternal,Mode=TwoWay}" Margin="0,4,0,0"></RadioButton>
+                <RadioButton Content="O365" IsChecked="{Binding IsInternal,Mode=TwoWay,Converter={StaticResource InverseBooleanConverter}}" Margin="0,4,0,0"></RadioButton>
+                <Button Content="save server settings" Width="180" HorizontalAlignment="Left" Margin="0,12,0,0" x:Name="BtnSaveSettings" Click="btnSaveSettings_Click"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

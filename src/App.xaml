@@ -1,0 +1,22 @@
+﻿<Application x:Class="Hummingbird.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Hummingbird.ViewModels"
+             xmlns:converters="clr-namespace:Hummingbird.Core.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.xaml" />
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Light.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <local:AccountSettingsViewModel x:Key="AccountSettingsViewModel"></local:AccountSettingsViewModel>
+            <local:DlGroupMigrationViewModel x:Key="DlGroupMigrationViewModel"></local:DlGroupMigrationViewModel>
+
+            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"></converters:InverseBooleanToVisibilityConverter>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"></converters:InverseBooleanConverter>
+            <converters:AliasValidToImageConverter x:Key="AliasValidToImageConverter"></converters:AliasValidToImageConverter>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

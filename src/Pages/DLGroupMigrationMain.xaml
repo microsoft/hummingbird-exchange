@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="Hummingbird.Pages.DlGroupMigrationMain"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             mc:Ignorable="d" DataContext="{Binding Instance,Source={StaticResource DlGroupMigrationViewModel}}"
+             
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Style="{StaticResource ContentRoot}">
+        <ScrollViewer>
+            <StackPanel MinWidth="200">                
+                <StackPanel>
+                    <TextBlock Text="STEP 1: BACKUP DISTRIBUTION LIST" Style="{StaticResource Heading2}"></TextBlock>
+                    <TextBlock TextWrapping="Wrap" Text="this will create a local copy of the distribution list with all the associated members and owner. nested distribution lists will be expanded."></TextBlock>
+                    <TextBlock Style="{StaticResource Title}" Text="alias" Margin="0,12,0,0"></TextBlock>
+                    <TextBox IsEnabled="{Binding BackupControlsEnabled}" Width="220" HorizontalAlignment="Left" Margin="0,0,0,8" x:Name="TxtDlAlias"/>
+                    <Button IsEnabled="{Binding BackupControlsEnabled}" Content="create backup" Width="150" HorizontalAlignment="Left" x:Name="BtnCreateBackup" Click="btnCreateBackup_Click" Margin="0,8,0,0"></Button>
+                </StackPanel>
+
+                <StackPanel Margin="0,24,0,0">
+                    <TextBlock Text="STEP 2: CREATE GROUP FROM DL BACKUP" Style="{StaticResource Heading2}"></TextBlock>
+                    <TextBlock TextWrapping="Wrap" Text="this will create a new group with all distribution list members added."></TextBlock>
+                    <TextBlock Style="{StaticResource Title}" Text="backup path" Margin="0,12,0,0"></TextBlock>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBox x:Name="TxtPath" IsReadOnly="True" IsReadOnlyCaretVisible="True" Width="220" HorizontalAlignment="Left"/>
+                        <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnOpenDlFile" Click="BtnOpenDlFile_OnClick" Content="browse..." Width="150" Margin="8,0,0,0"></Button>
+                    </StackPanel>
+
+                    <TextBlock Style="{StaticResource Title}" Text="alias" Margin="0,12,0,0"></TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="TxtGroupAlias" Text="{Binding CurrentlyActiveDl.Name, Mode=TwoWay}" TextChanged="TxtGroupAlias_OnTextChanged"  IsEnabled="{Binding RestoreControlsEnabled}" Width="220" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                        <Image Source="{Binding IsAliasValid, Converter={StaticResource AliasValidToImageConverter}}" Margin="12,-6,0,0" Stretch="UniformToFill" Height="16" Width="16" x:Name="ImgStatus"></Image>
+                    </StackPanel>
+                    
+                    <TextBlock Style="{StaticResource Title}" Text="members" Margin="0,12,0,0"></TextBlock>
+                    <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnViewMembers" Click="BtnViewMembers_OnClick" Content="view members" Width="150" HorizontalAlignment="Left" Margin="0,8,0,0"></Button>
+                    <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnCreateGroup" Click="BtnCreateGroup_OnClick" Content="create group" Width="150" HorizontalAlignment="Left" Margin="0,8,0,0"></Button>
+                   
+                    <!--<Button Background="Red" x:Name="BtnTest" Click="BtnTest_Click">TEST - BIG RED BUTTON</Button>-->
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,24,0,0" x:Name="StkBackupProgress" Visibility="{Binding BackupControlsEnabled,Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                    <mui:ModernProgressRing IsActive="True" Width="48" Style="{StaticResource DoubleBounceProgressRingStyle}" Height="48"></mui:ModernProgressRing>
+                    <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Text="trying to identify alias..." x:Name="TxtBackupStatus"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
