@@ -1,0 +1,12 @@
+# User-specific settings
+.vs/
+*.suo
+
+# Build artifacts
+bin/
+obj/
+*.dll
+*.pdb
+
+# Caches
+packages/
