@@ -93,11 +93,23 @@ namespace Hummingbird.Pages
                         owner = await adConnector.GetDistributionListOwner(TxtDlAlias.Text);
                     }
 
-                    if (!string.IsNullOrWhiteSpace(owner))
+                    bool resolveMembers = !string.IsNullOrWhiteSpace(owner);
+                    if (!resolveMembers)
+                    {
+                        var result =
+                            ModernDialog.ShowMessage(
+                                "The group owner could not be found. Would you like to attempt to retrieve members anyway? The backup will be missing the Owner property.",
+                                "Hummingbird", MessageBoxButton.YesNo);
+
+                        resolveMembers = result == MessageBoxResult.Yes;
+                    }
+
+                    if (resolveMembers)
                     {
                         dl.Owner = owner;
-
+                        
                         TxtBackupStatus.Text = "getting members...";
+                        
                         var members = await adConnector.GetDistributionListMembers(TxtDlAlias.Text);
                         if (members != null)
                         {
@@ -131,12 +143,6 @@ namespace Hummingbird.Pages
                                 "We couldn't get distribution list members. Check your credentials.", "Hummingbird",
                                 MessageBoxButton.OK);
                         }
-                    }
-                    else
-                    {
-                        ModernDialog.ShowMessage(
-                            "The alias could not be resolved or you might not have Active Directory access.",
-                            "Hummingbird", MessageBoxButton.OK);
                     }
 
                     // Re-enable the pieces of UI that might interfere.
