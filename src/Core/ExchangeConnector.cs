@@ -114,7 +114,7 @@ namespace Hummingbird.Core
         /// <param name="additionalParam">List of additional parameters needed for a request.</param>
         /// <returns></returns>
         public IExchangeResponse PerformExchangeRequest(UserCredentials credentials, string exchangeUrl, string param,
-            ExchangeRequestType requestType, List<string> additionalParam = null)
+            ExchangeRequestType requestType, IEnumerable<string> additionalParam = null)
         {
             var postContent = string.Empty;
             Type type = null;
