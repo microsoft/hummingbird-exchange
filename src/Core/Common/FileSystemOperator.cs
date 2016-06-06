@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -30,7 +31,7 @@ namespace Hummingbird.Core.Common
             {
                 var directory = Directory.CreateDirectory(AppPath);
 
-                var serializer = new XmlSerializer(typeof (DistributionList));
+                var serializer = new XmlSerializer(typeof(DistributionList));
                 path = Path.Combine(directory.FullName, distributionList.Name + ".xmldl");
 
                 using (var writer = new StreamWriter(path))
@@ -57,6 +58,45 @@ namespace Hummingbird.Core.Common
         }
 
         /// <summary>
+        /// Stores the DL invalid members info in a local file.
+        /// </summary>
+        /// <param name="distributionList">Existing distribution list model.</param>
+        /// <returns></returns>
+        internal string StoreDistributionListFailures(DistributionList distributionList, string action, AddMembersErrorDetails error)
+        {
+            string path;
+
+            try
+            {
+                var directory = Directory.CreateDirectory(AppPath);
+
+                var serializer = new XmlSerializer(typeof(AddMembersErrorDetails));
+                path = Path.Combine(directory.FullName, distributionList.Name + "_" + action + "_Failures.xmldl");
+
+                using (var writer = new StreamWriter(path))
+                {
+                    serializer.Serialize(writer, error);
+                }
+
+                LoggingViewModel.Instance.Logger.Write(string.Concat("StoreDistributionListInvalidMembers:OK ", path,
+                    Environment.NewLine,
+                    distributionList.Name));
+            }
+            catch (Exception exception)
+            {
+                LoggingViewModel.Instance.Logger.Write(string.Concat("StoreDistributionListInvalidMembers:Error ",
+                    exception.Message, Environment.NewLine,
+                    exception.StackTrace,
+                    Environment.NewLine,
+                    distributionList.Owner));
+
+                path = string.Empty;
+            }
+
+            return path;
+        }
+
+        /// <summary>
         /// Loads distribution list information from an external file.
         /// </summary>
         /// <param name="filePath">Path to file.</param>
@@ -67,8 +107,8 @@ namespace Hummingbird.Core.Common
             {
                 using (var reader = new StreamReader(filePath))
                 {
-                    var serializer = new XmlSerializer(typeof (DistributionList));
-                    var distributionList = (DistributionList) serializer.Deserialize(reader);
+                    var serializer = new XmlSerializer(typeof(DistributionList));
+                    var distributionList = (DistributionList)serializer.Deserialize(reader);
 
                     return distributionList;
                 }

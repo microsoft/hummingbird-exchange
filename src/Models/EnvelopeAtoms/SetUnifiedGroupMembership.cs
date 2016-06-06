@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Hummingbird.Models.EnvelopeAtoms
@@ -15,5 +15,12 @@ namespace Hummingbird.Models.EnvelopeAtoms
 
         [XmlAttributeAttribute()]
         public string ResponseClass { get; set; }
+        /// <remarks/>
+        /// 
+        [System.Xml.Serialization.XmlArrayItemAttribute("Member", IsNullable = true)]
+        public List<string> InvalidMembers { get; set; }
+
+        [System.Xml.Serialization.XmlArrayItemAttribute("Member", IsNullable = true)]
+        public List<string> FailedMembers { get; set; }
     }
 }

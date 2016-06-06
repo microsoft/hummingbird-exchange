@@ -130,6 +130,7 @@
       <DependentUpon>ViewMembersDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IExchangeResponse.cs" />
+    <Compile Include="Models\AddMembersErrorDetails.cs" />
     <Compile Include="Models\DistributionList.cs" />
     <Compile Include="Models\EnvelopeAtoms\GetUnifiedGroupMembersResponseMessageMembersInfo.cs" />
     <Compile Include="Models\EnvelopeAtoms\GetUnifiedGroupResponse.cs" />

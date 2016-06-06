@@ -19,16 +19,17 @@ namespace Hummingbird.Core.Internal
         }
 
         private ObservableCollection<string> Members { get; set; }
-        private ExchangeService Service { get; }
+        private ExchangeService Service { get; set; }
 
         /// <summary>
         ///     Gets the owner of a distribution list on the local Microsoft domain.
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        internal async Task<string> GetDistributionListOwner(string alias)
+        internal async Task<Tuple<string, bool>> GetDistributionListOwner(string alias)
         {
             var result = string.Empty;
+            var isValidDl = false;
 
             await Task.Run(() =>
             {
@@ -39,26 +40,37 @@ namespace Hummingbird.Core.Internal
                         context.Name, "\n", context.UserName));
 
                     var distributionList = GroupPrincipal.FindByIdentity(context, IdentityType.SamAccountName, alias);
-                    LoggingViewModel.Instance.Logger.Write(string.Concat("AD:DL ", distributionList.DisplayName, "\n",
-                        distributionList.UserPrincipalName, "\n", distributionList.Guid));
 
-                    var entry = (DirectoryEntry) distributionList.GetUnderlyingObject();
-                    var propertyValueCollection = entry.Properties["managedBy"];
-                    var userIdentity = propertyValueCollection.Value.ToString();
-
-                    var regex = new Regex(string.Concat("DC=(.*),DC=", AppSetup.ActiveDomainControllerPrefix));
-                    var match = regex.Match(userIdentity);
-
-                    var domain = AppSetup.ActiveLookupDomain;
-                    if (match.Success)
+                    if (distributionList != null)
                     {
-                        domain = match.Groups[1].Value;
+                        isValidDl = true;
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("AD:DL ", distributionList.DisplayName, "\n",
+                            distributionList.UserPrincipalName, "\n", distributionList.Guid));
+
+                        var entry = (DirectoryEntry)distributionList.GetUnderlyingObject();
+                        var propertyValueCollection = entry.Properties["managedBy"];
+                        var userIdentity = propertyValueCollection.Value.ToString();
+
+                        var regex = new Regex(string.Concat("DC=(.*),DC=", AppSetup.ActiveDomainControllerPrefix));
+                        var match = regex.Match(userIdentity);
+
+                        var domain = AppSetup.ActiveLookupDomain;
+                        if (match.Success)
+                        {
+                            domain = match.Groups[1].Value;
+                        }
+                        context = new PrincipalContext(ContextType.Domain, domain);
+                        var contextualName = UserPrincipal.FindByIdentity(context, userIdentity);
+                        if (contextualName != null)
+                        {
+                            result = contextualName.UserPrincipalName;
+                        }
                     }
-                    context = new PrincipalContext(ContextType.Domain, domain);
-                    var contextualName = UserPrincipal.FindByIdentity(context, userIdentity);
-                    if (contextualName != null)
+                    else
                     {
-                        result = contextualName.UserPrincipalName;
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("GetDistributionListOwner",
+                            Environment.NewLine,
+                            "INVALID DL", Environment.NewLine, alias));
                     }
                 }
                 catch (Exception ex)
@@ -68,7 +80,7 @@ namespace Hummingbird.Core.Internal
                 }
             });
 
-            return result;
+            return new Tuple<string, bool>(result, isValidDl);
         }
 
         /// <summary>

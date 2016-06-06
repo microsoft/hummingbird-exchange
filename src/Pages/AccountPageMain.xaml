@@ -21,8 +21,8 @@
                 <TextBlock Style="{StaticResource Title}" Text="url"></TextBlock>
                 <TextBox Text="{Binding ServerUrl,Mode=TwoWay}" Width="200" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                 <TextBlock Style="{StaticResource Title}" Text="target"></TextBlock>
-                <RadioButton Content="active directory" IsChecked="{Binding IsInternal,Mode=TwoWay}" Margin="0,4,0,0"></RadioButton>
-                <RadioButton Content="O365" IsChecked="{Binding IsInternal,Mode=TwoWay,Converter={StaticResource InverseBooleanConverter}}" Margin="0,4,0,0"></RadioButton>
+                <RadioButton Content="Internal" IsChecked="{Binding IsInternal,Mode=TwoWay}" Margin="0,4,0,0"></RadioButton>
+                <RadioButton Content="External" IsChecked="{Binding IsInternal,Mode=TwoWay,Converter={StaticResource InverseBooleanConverter}}" Margin="0,4,0,0"></RadioButton>
                 <Button Content="save server settings" Width="180" HorizontalAlignment="Left" Margin="0,12,0,0" x:Name="BtnSaveSettings" Click="btnSaveSettings_Click"></Button>
             </StackPanel>
         </StackPanel>

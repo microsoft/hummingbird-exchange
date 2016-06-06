@@ -3,8 +3,8 @@
     public static class AppSetup
     {
         // Active Directory lookup settings
-        public const string ActiveLookupDomain = "CHANGE_DOMAIN";
-        public const string ActiveDomainControllerPrefix = "CHANGE_CONTROLLER_PREFIX";
+        public const string ActiveLookupDomain = "REDMOND";
+        public const string ActiveDomainControllerPrefix = "corp";
 
         // Settings location
         public const string CredentialContainerName = "container";
@@ -15,6 +15,7 @@
         // request files.
         public const string GroupIdFiller = "##GROUPID##";
         public const string GroupSmtpFiller = "##GROUP_SMTP_ADDRESS##";
+        public const string OwnerSmtpFiller = "##OWNER_SMTP_ADDRESS##";
 
         // Commandlets used to execute queries against a connected O365 PS session.
         public const string CmdletGetDistributionGroup = "Get-DistributionGroup";

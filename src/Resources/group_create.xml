@@ -1,1 +1,27 @@
-<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Header><RequestServerVersion Version="Exchange2015" xmlns="http://schemas.microsoft.com/exchange/services/2006/types"/></s:Header><s:Body><CreateUnifiedGroup xmlns="http://schemas.microsoft.com/exchange/services/2006/messages"><Name>##GROUPID##</Name><Alias>##GROUPID##</Alias><AccessType xmlns="http://schemas.microsoft.com/exchange/services/2006/types">Public</AccessType><Description/><AutoSubscribeNewMembers>true</AutoSubscribeNewMembers><CultureName>en-US</CultureName></CreateUnifiedGroup></s:Body></s:Envelope>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Header>
+    <RequestServerVersion Version="Exchange2015" xmlns="http://schemas.microsoft.com/exchange/services/2006/types"/>
+  </s:Header>
+  <s:Body>
+    <CreateUnifiedGroup xmlns="http://schemas.microsoft.com/exchange/services/2006/messages">
+      <Name>##GROUPID##</Name>
+      <Alias>##GROUPID##</Alias>
+      <AccessType xmlns="http://schemas.microsoft.com/exchange/services/2006/types">Public</AccessType>
+      <Description/>
+      <AutoSubscribeNewMembers>false</AutoSubscribeNewMembers>
+      <Owner>##OWNER_SMTP_ADDRESS##</Owner>
+      <CultureName>en-US</CultureName>
+      <ExchangeProvisioningOptions xmlns="http://schemas.microsoft.com/exchange/services/2006/types">
+        <AllowOnlyMembersToPost>false</AllowOnlyMembersToPost>
+        <AlwaysSubscribeMembersToCalendarEvents>true</AlwaysSubscribeMembersToCalendarEvents>
+        <AutoSubscribeNewGroupMembers>true</AutoSubscribeNewGroupMembers>
+        <CalendarMemberReadOnly>false</CalendarMemberReadOnly>
+        <ConnectorsEnabled>false</ConnectorsEnabled>
+        <ReportToOriginatorEnabled>false</ReportToOriginatorEnabled>
+        <SubscriptionEnabled>true</SubscriptionEnabled>
+        <WarmupEmailEnabled>true</WarmupEmailEnabled>
+        <WelcomeMessageEnabled>false</WelcomeMessageEnabled>
+      </ExchangeProvisioningOptions>
+    </CreateUnifiedGroup>
+  </s:Body>
+</s:Envelope>
