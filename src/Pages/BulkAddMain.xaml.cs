@@ -78,7 +78,7 @@ namespace Hummingbird.Pages
                     int invalidMemberCount = membersAdded.Where(r => r.InvalidMembers != null).Sum(r => r.InvalidMembers.Count);
                     int successfulMembersCount = totalMembersCount - (invalidMemberCount + failedMemberCount);
 
-                    if (!membersAdded.Any(x => x.StatusCode.ToLower() != "noerror"))
+                    if (membersAdded.All(x => x.StatusCode.ToLower() == "noerror"))
                     {
                         string message = string.Format("Bulk add complete! Added {0} members.", totalMembersCount);
 
@@ -117,9 +117,11 @@ namespace Hummingbird.Pages
                             MessageBoxButton.OK);
 
                         var fsOperator = new FileSystemOperator();
-                        AddMembersErrorDetails error = new AddMembersErrorDetails();
-                        error.FailedMembers = new List<string>();
-                        error.InvalidMembers = new List<string>();
+                        AddMembersErrorDetails error = new AddMembersErrorDetails
+                        {
+                            FailedMembers = new List<string>(),
+                            InvalidMembers = new List<string>()
+                        };
                         foreach (var list in membersAdded)
                         {
                             if (list.FailedMembers != null) { error.FailedMembers.AddRange(list.FailedMembers); }
@@ -224,7 +226,7 @@ namespace Hummingbird.Pages
 
                     var gugResults = await GetGroupInformation(credentials, TxtBackupGroupBox.Text);
 
-                    GetUnifiedGroupEnvelope gugEnvelope = (GetUnifiedGroupEnvelope)gugResults;
+                    GetUnifiedGroupEnvelope gugEnvelope = (GetUnifiedGroupEnvelope) gugResults;
 
                     GroupSimplifier simplifier = new GroupSimplifier();
                     var dl =
@@ -292,7 +294,7 @@ namespace Hummingbird.Pages
                     AccountSettingsViewModel.Instance.ServerUrl, groupQualifiedName, ExchangeRequestType.GetUnifiedGroupDetails);
             });
 
-            return (GetUnifiedGroupEnvelope)result;
+            return (GetUnifiedGroupEnvelope) result;
         }
 
         private class BulkAddMembersResult

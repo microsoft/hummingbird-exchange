@@ -20,7 +20,7 @@
         <ReportToOriginatorEnabled>false</ReportToOriginatorEnabled>
         <SubscriptionEnabled>true</SubscriptionEnabled>
         <WarmupEmailEnabled>true</WarmupEmailEnabled>
-        <WelcomeMessageEnabled>false</WelcomeMessageEnabled>
+        <WelcomeMessageEnabled>true</WelcomeMessageEnabled>
       </ExchangeProvisioningOptions>
     </CreateUnifiedGroup>
   </s:Body>

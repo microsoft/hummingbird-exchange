@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -31,7 +30,7 @@ namespace Hummingbird.Core.Common
             {
                 var directory = Directory.CreateDirectory(AppPath);
 
-                var serializer = new XmlSerializer(typeof(DistributionList));
+                var serializer = new XmlSerializer(typeof (DistributionList));
                 path = Path.Combine(directory.FullName, distributionList.Name + ".xmldl");
 
                 using (var writer = new StreamWriter(path))
@@ -61,8 +60,10 @@ namespace Hummingbird.Core.Common
         /// Stores the DL invalid members info in a local file.
         /// </summary>
         /// <param name="distributionList">Existing distribution list model.</param>
+        /// <param name="actionName">Name of the flow attempting to write a failure list</param>
+        /// <param name="errorDetails">Add Members details to be written</param>
         /// <returns></returns>
-        internal string StoreDistributionListFailures(DistributionList distributionList, string action, AddMembersErrorDetails error)
+        internal string StoreDistributionListFailures(DistributionList distributionList, string actionName, AddMembersErrorDetails errorDetails)
         {
             string path;
 
@@ -71,11 +72,11 @@ namespace Hummingbird.Core.Common
                 var directory = Directory.CreateDirectory(AppPath);
 
                 var serializer = new XmlSerializer(typeof(AddMembersErrorDetails));
-                path = Path.Combine(directory.FullName, distributionList.Name + "_" + action + "_Failures.xmldl");
+                path = Path.Combine(directory.FullName, distributionList.Name + "_" + actionName + "_Failures.xmldl");
 
                 using (var writer = new StreamWriter(path))
                 {
-                    serializer.Serialize(writer, error);
+                    serializer.Serialize(writer, errorDetails);
                 }
 
                 LoggingViewModel.Instance.Logger.Write(string.Concat("StoreDistributionListInvalidMembers:OK ", path,
@@ -107,8 +108,8 @@ namespace Hummingbird.Core.Common
             {
                 using (var reader = new StreamReader(filePath))
                 {
-                    var serializer = new XmlSerializer(typeof(DistributionList));
-                    var distributionList = (DistributionList)serializer.Deserialize(reader);
+                    var serializer = new XmlSerializer(typeof (DistributionList));
+                    var distributionList = (DistributionList) serializer.Deserialize(reader);
 
                     return distributionList;
                 }

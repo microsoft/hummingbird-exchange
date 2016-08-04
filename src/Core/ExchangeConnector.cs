@@ -25,6 +25,7 @@ namespace Hummingbird.Core
         /// </summary>
         /// <param name="dl">Distribution list name (alias) without the domain.</param>
         /// <param name="credentials">User credentials for service access.</param>
+        /// <param name="isValidDl">Indicates if there exists a DL with the alias.</param>
         /// <returns></returns>
         public string GetExternalDistributionListOwner(string dl, UserCredentials credentials, out bool isValidDl)
         {
@@ -132,7 +133,7 @@ namespace Hummingbird.Core
             Type type = null;
 
             var authHeaderContent = GetBasicAuthFormat(credentials);
-            var request = (HttpWebRequest)WebRequest.Create(exchangeUrl);
+            var request = (HttpWebRequest) WebRequest.Create(exchangeUrl);
             request.Method = WebRequestMethods.Http.Post;
             request.Headers.Add(HttpRequestHeader.Authorization, string.Concat("Basic ", authHeaderContent));
             request.ContentType = "text/xml";
@@ -144,7 +145,7 @@ namespace Hummingbird.Core
                         LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:ValidateAlias ", param));
 
                         postContent = Resources.AliasValidationPOST.Replace(AppSetup.GroupIdFiller, param);
-                        type = typeof(AliasValidationEnvelope);
+                        type = typeof (AliasValidationEnvelope);
                         break;
                     }
                 case ExchangeRequestType.CreateGroup:
@@ -156,7 +157,7 @@ namespace Hummingbird.Core
                         {
                             postContent = postContent.Replace(AppSetup.OwnerSmtpFiller, additionalParam.First());
                         }
-                        type = typeof(GroupCreationEnvelope);
+                        type = typeof (GroupCreationEnvelope);
                         break;
                     }
                 case ExchangeRequestType.GetUnifiedGroupDetails:
@@ -164,7 +165,7 @@ namespace Hummingbird.Core
                         LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:GetGroupDetails ", param));
 
                         postContent = Resources.GetUnifiedGroupsPOST.Replace(AppSetup.GroupSmtpFiller, param);
-                        type = typeof(GetUnifiedGroupEnvelope);
+                        type = typeof (GetUnifiedGroupEnvelope);
 
                         break;
                     }
@@ -187,8 +188,8 @@ namespace Hummingbird.Core
                             {
                                 using (var reader = new StreamReader(addMemberEnvelopeStream))
                                 {
-                                    var serializer = new XmlSerializer(typeof(AddMemberEnvelope));
-                                    var deserializedContent = (AddMemberEnvelope)serializer.Deserialize(reader);
+                                    var serializer = new XmlSerializer(typeof (AddMemberEnvelope));
+                                    var deserializedContent = (AddMemberEnvelope) serializer.Deserialize(reader);
 
                                     deserializedContent.Body.SetUnifiedGroupMembershipState.Members =
                                         new List<string>(additionalParam);
@@ -210,7 +211,7 @@ namespace Hummingbird.Core
                                             LoggingViewModel.Instance.Logger.Write(
                                                 string.Concat("ExchangeConnector:AddMemberPostContent ", postContent));
 
-                                            type = typeof(SetMemberEnvelope);
+                                            type = typeof (SetMemberEnvelope);
                                         }
                                     }
                                 }
@@ -235,7 +236,7 @@ namespace Hummingbird.Core
 
             try
             {
-                var response = (HttpWebResponse)request.GetResponse();
+                var response = (HttpWebResponse) request.GetResponse();
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     using (var responseStream = response.GetResponseStream())
@@ -244,7 +245,7 @@ namespace Hummingbird.Core
                         {
                             var serializer = new XmlSerializer(type);
 
-                            var translatedResponse = (IExchangeResponse)serializer.Deserialize(reader);
+                            var translatedResponse = (IExchangeResponse) serializer.Deserialize(reader);
                             return translatedResponse;
                         }
                     }

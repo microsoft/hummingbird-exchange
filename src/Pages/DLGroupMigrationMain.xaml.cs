@@ -33,7 +33,7 @@ namespace Hummingbird.Pages
         {
             InitializeComponent();
 
-            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1)};
             _timer.Tick += _timer_Tick;
         }
 
@@ -81,7 +81,7 @@ namespace Hummingbird.Pages
                     TxtBackupStatus.Text = "trying to identify alias...";
 
                     var adConnector = new ActiveDirectoryConnector();
-                    var dl = new DistributionList { Name = TxtDlAlias.Text };
+                    var dl = new DistributionList {Name = TxtDlAlias.Text};
                     var owner = string.Empty;
                     bool isValidDl;
                     if (!AccountSettingsViewModel.Instance.IsInternal)
@@ -386,7 +386,7 @@ namespace Hummingbird.Pages
                     AccountSettingsViewModel.Instance.ServerUrl, alias, ExchangeRequestType.ValidateAlias);
             });
 
-            return result != null && ((AliasValidationEnvelope)result).Body.Response.IsAliasUnique;
+            return result != null && ((AliasValidationEnvelope) result).Body.Response.IsAliasUnique;
         }
 
         private void BtnViewMembers_OnClick(object sender, RoutedEventArgs e)
@@ -397,7 +397,7 @@ namespace Hummingbird.Pages
 
         private void BtnOpenDlFile_OnClick(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog { Filter = "XML DL Files (*.xmldl) | *.xmldl" };
+            var openFileDialog = new OpenFileDialog { Filter = "XML DL Files (*.xmldl) | *.xmldl"};
             var result = openFileDialog.ShowDialog();
 
             if (result != true) return;

@@ -47,7 +47,7 @@ namespace Hummingbird.Core.Internal
                         LoggingViewModel.Instance.Logger.Write(string.Concat("AD:DL ", distributionList.DisplayName, "\n",
                             distributionList.UserPrincipalName, "\n", distributionList.Guid));
 
-                        var entry = (DirectoryEntry)distributionList.GetUnderlyingObject();
+                        var entry = (DirectoryEntry) distributionList.GetUnderlyingObject();
                         var propertyValueCollection = entry.Properties["managedBy"];
                         var userIdentity = propertyValueCollection.Value.ToString();
 
