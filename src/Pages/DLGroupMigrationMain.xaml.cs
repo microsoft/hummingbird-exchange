@@ -203,7 +203,7 @@ namespace Hummingbird.Pages
 
                                 if (!string.IsNullOrWhiteSpace(groupCreated))
                                 {
-                                    ModernDialog.ShowMessage("Group creation complete!", "Hummingbird",
+                                    ModernDialog.ShowMessage(string.Format("Your group has been created successfully. SMTP: {0}", groupCreated), "Hummingbird",
                                         MessageBoxButton.OK);
                                 }
 
@@ -272,7 +272,7 @@ namespace Hummingbird.Pages
                             {
                                 if (invalidMembers.Count == 0)
                                 {
-                                    ModernDialog.ShowMessage("Your group has been created successfully.", "Hummingbird",
+                                    ModernDialog.ShowMessage(string.Format("Your group has been created successfully. SMTP: {0}.", groupCreated), "Hummingbird",
                                                 MessageBoxButton.OK);
                                 }
                                 else

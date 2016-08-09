@@ -136,6 +136,7 @@ namespace Hummingbird.Core
             var request = (HttpWebRequest) WebRequest.Create(exchangeUrl);
             request.Method = WebRequestMethods.Http.Post;
             request.Headers.Add(HttpRequestHeader.Authorization, string.Concat("Basic ", authHeaderContent));
+            request.Headers.Add(HttpRequestHeader.UserAgent, "Humming Bird");
             request.ContentType = "text/xml";
 
             switch (requestType)
