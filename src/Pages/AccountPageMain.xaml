@@ -21,7 +21,9 @@
                 <TextBlock Style="{StaticResource Title}" Text="url"></TextBlock>
                 <TextBox Text="{Binding ServerUrl,Mode=TwoWay}" Width="200" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                 <TextBlock Style="{StaticResource Title}" Text="target"></TextBlock>
+                <!-- Internal: Uses AD to fetch the DL details and is meant to be used by MSFT users -->
                 <RadioButton Content="Internal" IsChecked="{Binding IsInternal,Mode=TwoWay}" Margin="0,4,0,0"></RadioButton>
+                <!-- External: Uses Cmdlets to fetch the DL details and is meant to be used by any tenant admin -->
                 <RadioButton Content="External" IsChecked="{Binding IsInternal,Mode=TwoWay,Converter={StaticResource InverseBooleanConverter}}" Margin="0,4,0,0"></RadioButton>
                 <Button Content="save server settings" Width="180" HorizontalAlignment="Left" Margin="0,12,0,0" x:Name="BtnSaveSettings" Click="btnSaveSettings_Click"></Button>
             </StackPanel>

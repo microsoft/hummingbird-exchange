@@ -48,7 +48,7 @@ namespace Hummingbird.Core.Common
                     exception.Message, Environment.NewLine,
                     exception.StackTrace, Environment.NewLine, string.Join(",", distributionList.Members.ToArray()),
                     Environment.NewLine,
-                    distributionList.Owner));
+                    distributionList.Name));
 
                 path = string.Empty;
             }

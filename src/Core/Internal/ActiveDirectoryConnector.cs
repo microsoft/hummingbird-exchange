@@ -70,7 +70,7 @@ namespace Hummingbird.Core.Internal
                     {
                         LoggingViewModel.Instance.Logger.Write(string.Concat("GetDistributionListOwner",
                             Environment.NewLine,
-                            "INVALID DL", Environment.NewLine, alias));
+                            "DistributionListNotFound", Environment.NewLine, alias));
                     }
                 }
                 catch (Exception ex)

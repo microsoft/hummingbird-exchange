@@ -79,11 +79,17 @@ namespace Hummingbird.Core
 
                         plPileLine.Stop();
                     }
+                    else if (rsResultsresults.Count == 0)
+                    {
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("GetExternalDistributionListOwner ",
+                            Environment.NewLine,
+                            "DistributionListNotFound", Environment.NewLine, dl));
+                    }
                     else
                     {
                         LoggingViewModel.Instance.Logger.Write(string.Concat("GetExternalDistributionListOwner ",
                             Environment.NewLine,
-                            "INVALID DL", Environment.NewLine, dl));
+                            "NonUniqueDistributionListFound", Environment.NewLine, dl));
                     }
                 }
 
@@ -136,7 +142,7 @@ namespace Hummingbird.Core
             var request = (HttpWebRequest) WebRequest.Create(exchangeUrl);
             request.Method = WebRequestMethods.Http.Post;
             request.Headers.Add(HttpRequestHeader.Authorization, string.Concat("Basic ", authHeaderContent));
-            request.Headers.Add(HttpRequestHeader.UserAgent, "Humming Bird");
+            request.UserAgent = "Hummingbird";
             request.ContentType = "text/xml";
 
             switch (requestType)
@@ -154,9 +160,10 @@ namespace Hummingbird.Core
                         LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:CreateGroup ", param));
 
                         postContent = Resources.GroupCreationPOST.Replace(AppSetup.GroupIdFiller, param);
-                        if (additionalParam != null && additionalParam.Count() == 1)
+                        var additionalParamList = additionalParam.ToList();
+                        if (additionalParam != null && additionalParamList.Count == 1)
                         {
-                            postContent = postContent.Replace(AppSetup.OwnerSmtpFiller, additionalParam.First());
+                            postContent = postContent.Replace(AppSetup.OwnerSmtpFiller, additionalParamList[0]);
                         }
                         type = typeof (GroupCreationEnvelope);
                         break;

@@ -69,16 +69,16 @@ namespace Hummingbird.Pages
                     var credManager = new CredentialManager();
                     var credentials = credManager.GetUserCredentials();
 
-                    var membersAdded = await AddMembersToGroup(credentials, TxtGroupAddress.Text,
+                    BulkAddMembersResult[] addMembersResults = await AddMembersToGroup(credentials, TxtGroupAddress.Text,
                         DlGroupMigrationViewModel.Instance.BulkAddDistributionList.Members.ToList());
                     DlGroupMigrationViewModel.Instance.BulkAddDistributionList.Name = TxtGroupAddress.Text;
 
                     int totalMembersCount = DlGroupMigrationViewModel.Instance.BulkAddDistributionList.Members.Count;
-                    int failedMemberCount = membersAdded.Where(r => r.FailedMembers != null).Sum(r => r.FailedMembers.Count);
-                    int invalidMemberCount = membersAdded.Where(r => r.InvalidMembers != null).Sum(r => r.InvalidMembers.Count);
+                    int failedMemberCount = addMembersResults.Where(r => r.FailedMembers != null).Sum(r => r.FailedMembers.Count);
+                    int invalidMemberCount = addMembersResults.Where(r => r.InvalidMembers != null).Sum(r => r.InvalidMembers.Count);
                     int successfulMembersCount = totalMembersCount - (invalidMemberCount + failedMemberCount);
 
-                    if (membersAdded.All(x => x.StatusCode.ToLower() == "noerror"))
+                    if (addMembersResults.All(x => x.StatusCode.ToLower() == "noerror"))
                     {
                         string message = string.Format("Bulk add complete! Added {0} members.", totalMembersCount);
 
@@ -122,7 +122,7 @@ namespace Hummingbird.Pages
                             FailedMembers = new List<string>(),
                             InvalidMembers = new List<string>()
                         };
-                        foreach (var list in membersAdded)
+                        foreach (var list in addMembersResults)
                         {
                             if (list.FailedMembers != null) { error.FailedMembers.AddRange(list.FailedMembers); }
                             if (list.InvalidMembers != null) { error.InvalidMembers.AddRange(list.InvalidMembers); }
@@ -149,7 +149,7 @@ namespace Hummingbird.Pages
                 catch (Exception)
                 {
                     ModernDialog.ShowMessage(
-                        "An error occurred and we couldn't complete the request. Please try again after some time.",
+                        "An error occurred and we couldn't complete the request. Please try again later.",
                         "Hummingbird",
                         MessageBoxButton.OK);
                 }
@@ -168,16 +168,16 @@ namespace Hummingbird.Pages
             List<string> members)
         {
             var tasks = new List<Task<BulkAddMembersResult>>();
-            List<BulkAddMembersResult> membersAdded = new List<BulkAddMembersResult>();
+            var results = new List<BulkAddMembersResult>();
 
             for (int i = 0; i < members.Count; i += AddMembersBatchSize)
             {
                 IEnumerable<string> membersForBatch = members.Skip(i).Take(AddMembersBatchSize);
                 var task = Task.Run(() => AddMembersToGroupSingleBatch(credentials, alias, membersForBatch));
-                membersAdded.Add(await task);
+                results.Add(await task);
             }
 
-            return membersAdded.ToArray();
+            return results.ToArray();
         }
 
         private static BulkAddMembersResult AddMembersToGroupSingleBatch(UserCredentials credentials, string alias,
@@ -195,19 +195,18 @@ namespace Hummingbird.Pages
                     ? ((SetMemberEnvelope)result).Body.SetUnifiedGroupMembershipResponseMessage.ResponseCode
                     : string.Empty,
 
-                MemberCount = members.Count()
+                MemberCount = memberList.Count
             };
 
-            if (result != null)
+            if (addMemberResult.StatusCode.ToLower() != "noerror" && addMemberResult.StatusCode.ToLower() != "errorinvalidid")
+            {
+                addMemberResult.FailedMembers = memberList;
+            }
+            else if (result != null)
             {
                 addMemberResult.FailedMembers = ((SetMemberEnvelope)result).Body.SetUnifiedGroupMembershipResponseMessage.FailedMembers;
 
                 addMemberResult.InvalidMembers = ((SetMemberEnvelope)result).Body.SetUnifiedGroupMembershipResponseMessage.InvalidMembers;
-            }
-
-            if (addMemberResult.StatusCode.ToLower() != "noerror" && addMemberResult.StatusCode.ToLower() != "errorinvalidid")
-            {
-                addMemberResult.FailedMembers = members.ToList();
             }
 
             return addMemberResult;
