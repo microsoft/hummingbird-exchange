@@ -80,7 +80,7 @@ namespace Hummingbird.Pages
 
                     if (addMembersResults.All(x => x.StatusCode.ToLower() == "noerror"))
                     {
-                        string message = string.Format("Bulk add complete! Added {0} members.", totalMembersCount);
+                        string message = string.Format("The bulk add was successful. {0} members were added.", totalMembersCount);
 
                         ModernDialog.ShowMessage(
                             message,
@@ -134,7 +134,7 @@ namespace Hummingbird.Pages
                         {
                             var result =
                                 ModernDialog.ShowMessage(
-                                    "Failures list is created. Open Windows Explorer for its location?",
+                                    "A list of failures was created. Do you want to open File Explorer to find its location?",
                                     "Hummingbird", MessageBoxButton.YesNo);
 
                             if (result == MessageBoxResult.Yes)
@@ -149,7 +149,7 @@ namespace Hummingbird.Pages
                 catch (Exception)
                 {
                     ModernDialog.ShowMessage(
-                        "An error occurred and we couldn't complete the request. Please try again later.",
+                        "Members couldn't be added from the backup file. The alias may be invalid or there might be a problem connecting to the server. Please try again later.",
                         "Hummingbird",
                         MessageBoxButton.OK);
                 }

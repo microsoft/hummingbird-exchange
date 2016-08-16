@@ -104,7 +104,7 @@ namespace Hummingbird.Pages
                     {
                         var result =
                             ModernDialog.ShowMessage(
-                                "The alias provided does not map to a valid DL.",
+                                "The alias you provided doesn't map to a valid DL.",
                                 "Hummingbird", MessageBoxButton.OK);
                         resolveMembers = false;
                     }
@@ -112,7 +112,7 @@ namespace Hummingbird.Pages
                     {
                         var result =
                             ModernDialog.ShowMessage(
-                                "The group owner could not be found. Would you like to attempt to retrieve members anyway? The backup will be missing the Owner property.",
+                                "The group owner couldn't be found. If you attempt to retrieve members for the group, the backup will be missing the Owner property. Continue?",
                                 "Hummingbird", MessageBoxButton.YesNo);
                         resolveMembers = result == MessageBoxResult.Yes;
                     }
@@ -135,7 +135,7 @@ namespace Hummingbird.Pages
                             {
                                 var result =
                                     ModernDialog.ShowMessage(
-                                        "Distribution list backup created. Open Windows Explorer for its location?",
+                                        "A backup was created for the distribution list. Do you want to open File Explorer to find its location?",
                                         "Hummingbird", MessageBoxButton.YesNo);
 
                                 if (result == MessageBoxResult.Yes)
@@ -146,14 +146,14 @@ namespace Hummingbird.Pages
                             else
                             {
                                 ModernDialog.ShowMessage(
-                                    "We couldn't create the backup file for this distribution list.", "Hummingbird",
+                                    "We couldn't create a backup file for this distribution list. Please try again.", "Hummingbird",
                                     MessageBoxButton.OK);
                             }
                         }
                         else
                         {
                             ModernDialog.ShowMessage(
-                                "We couldn't get distribution list members. Check your credentials.", "Hummingbird",
+                                "We couldn't retrieve members of the distribution list. Check your credentials and try again.", "Hummingbird",
                                 MessageBoxButton.OK);
                         }
                     }
@@ -165,13 +165,13 @@ namespace Hummingbird.Pages
                 else
                 {
                     ModernDialog.ShowMessage(
-                        "There are no user credentials provided. Open SETTINGS and add your credentials.", "Hummingbird",
+                        "No credentials were provided. Open Settings and add your credentials.", "Hummingbird",
                         MessageBoxButton.OK);
                 }
             }
             else
             {
-                ModernDialog.ShowMessage("Alias cannot be empty!", "Hummingbird", MessageBoxButton.OK);
+                ModernDialog.ShowMessage("You must include an alias.", "Hummingbird", MessageBoxButton.OK);
             }
         }
 
@@ -203,7 +203,7 @@ namespace Hummingbird.Pages
 
                                 if (!string.IsNullOrWhiteSpace(groupCreated))
                                 {
-                                    ModernDialog.ShowMessage(string.Format("Your group has been created successfully. SMTP: {0}", groupCreated), "Hummingbird",
+                                    ModernDialog.ShowMessage(string.Format("Your group was created successfully. SMTP address: {0}", groupCreated), "Hummingbird",
                                         MessageBoxButton.OK);
                                 }
 
@@ -224,7 +224,7 @@ namespace Hummingbird.Pages
                             if (string.IsNullOrEmpty(groupCreated))
                             {
                                 operationFailed = true;
-                                ModernDialog.ShowMessage(string.Format("Group could not be created, please try migration after sometime."), "Hummingbird",
+                                ModernDialog.ShowMessage(string.Format("The group couldn't be created. Please try migrating again later."), "Hummingbird",
                                                 MessageBoxButton.OK);
                             }
                             else
@@ -261,7 +261,7 @@ namespace Hummingbird.Pages
 
                                     if (operationFailed)
                                     {
-                                        ModernDialog.ShowMessage(string.Format("Your group was created, but all the members were not added. Please go to “bulk add” to add the members using original backup and following group address {0}", groupCreated), "Hummingbird",
+                                        ModernDialog.ShowMessage(string.Format(@"The group was created, but not all the members were added. Please go to 'bulk add' to add the missing members using the original backup and the following group address {0}.", groupCreated), "Hummingbird",
                                             MessageBoxButton.OK);
                                         break;
                                     }
@@ -272,12 +272,12 @@ namespace Hummingbird.Pages
                             {
                                 if (invalidMembers.Count == 0)
                                 {
-                                    ModernDialog.ShowMessage(string.Format("Your group has been created successfully. SMTP: {0}.", groupCreated), "Hummingbird",
+                                    ModernDialog.ShowMessage(string.Format("Your group was created successfully. SMTP address: {0}.", groupCreated), "Hummingbird",
                                                 MessageBoxButton.OK);
                                 }
                                 else
                                 {
-                                    ModernDialog.ShowMessage("Your group has been created. Invalid members were not added.", "Hummingbird",
+                                    ModernDialog.ShowMessage("The group was created but invalid members weren't added.", "Hummingbird",
                                                 MessageBoxButton.OK);
 
                                     var fsOperator = new FileSystemOperator();
@@ -289,7 +289,7 @@ namespace Hummingbird.Pages
                                     {
                                         var result =
                                             ModernDialog.ShowMessage(
-                                                "The invalid members list is created. Open Windows Explorer for its location?",
+                                                "The list of invalid members was created. Do you want to open File Explorer to find its location?",
                                                 "Hummingbird", MessageBoxButton.YesNo);
 
                                         if (result == MessageBoxResult.Yes)
@@ -306,19 +306,20 @@ namespace Hummingbird.Pages
                     }
                     else
                     {
-                        ModernDialog.ShowMessage("Looks like you don't have any credentials associated.", "Hummingbird",
+                        ModernDialog.ShowMessage("No credentials were provided. Open Settings and add your credentials.", "Hummingbird",
                             MessageBoxButton.OK);
                     }
                 }
                 else
                 {
-                    ModernDialog.ShowMessage("Looks like an invalid alias or we can't reach the server at this time.",
-                        "Hummingbird", MessageBoxButton.OK);
+                    ModernDialog.ShowMessage("The group couldn't be created from the backup file. The alias may be invalid or there might be a problem connecting to the server. Please try again later.",
+                        "Hummingbird",
+                         MessageBoxButton.OK);
                 }
             }
             else
             {
-                ModernDialog.ShowMessage("Alias cannot be empty!", "Hummingbird", MessageBoxButton.OK);
+                ModernDialog.ShowMessage("You must include an alias.", "Hummingbird", MessageBoxButton.OK);
             }
 
             DlGroupMigrationViewModel.Instance.CurrentlyActiveDl = null;
