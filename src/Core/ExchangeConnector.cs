@@ -160,8 +160,8 @@ namespace Hummingbird.Core
                         LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:CreateGroup ", param));
 
                         postContent = Resources.GroupCreationPOST.Replace(AppSetup.GroupIdFiller, param);
-                        var additionalParamList = additionalParam.ToList();
-                        if (additionalParam != null && additionalParamList.Count == 1)
+                        var additionalParamList = additionalParam != null ? additionalParam.ToList() : null;
+                        if (additionalParamList != null && additionalParamList.Count == 1)
                         {
                             postContent = postContent.Replace(AppSetup.OwnerSmtpFiller, additionalParamList[0]);
                         }

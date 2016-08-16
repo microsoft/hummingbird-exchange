@@ -3,7 +3,7 @@
     public static class AppSetup
     {
         // Active Directory lookup settings
-        // While publishing an EXE for use by Microsoft, this value has to be ActiveLookupDomain:REDMOND ActiveDomainControllerPrefix:corp
+        // Ex: if the Domain is abc.xyz.contoso.com then the ActiveLookupDomain is abc and ActiveDomainControllerPrefix is xyz
         public const string ActiveLookupDomain = "CHANGE_DOMAIN";
         public const string ActiveDomainControllerPrefix = "CHANGE_CONTROLLER_PREFIX";
 
