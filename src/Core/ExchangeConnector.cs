@@ -25,10 +25,12 @@ namespace Hummingbird.Core
         /// </summary>
         /// <param name="dl">Distribution list name (alias) without the domain.</param>
         /// <param name="credentials">User credentials for service access.</param>
+        /// <param name="isValidDl">Indicates if there exists a DL with the alias.</param>
         /// <returns></returns>
-        public string GetExternalDistributionListOwner(string dl, UserCredentials credentials)
+        public string GetExternalDistributionListOwner(string dl, UserCredentials credentials, out bool isValidDl)
         {
             var owner = new StringBuilder();
+            isValidDl = false;
 
             var secureString = new SecureString();
             foreach (var c in credentials.Password)
@@ -41,7 +43,7 @@ namespace Hummingbird.Core
 
             var connectionInfo =
                 new WSManConnectionInfo(new Uri(string.Concat(serverUrl, "/powershell-liveid/")),
-                    "http://schemas.microsoft.com/powershell/Microsoft.Exchange", credential)
+                    "Microsoft.Exchange", credential)
                 {
                     AuthenticationMechanism = AuthenticationMechanism.Basic,
                     SkipCACheck = true,
@@ -64,14 +66,31 @@ namespace Hummingbird.Core
                     plPileLine.Commands.Add(getGroupCommand);
                     rsResultsresults = plPileLine.Invoke();
 
-                    var manager = rsResultsresults.First().Properties["ManagedBy"].Value;
+                    if (rsResultsresults.Count == 1)
+                    {
+                        isValidDl = true;
 
-                    var owners = manager.ToString().Split(' ');
+                        var manager = rsResultsresults.First().Properties["ManagedBy"].Value;
 
-                    owner.Append(owners[0]);
-                    owner.Append('@');
+                        var owners = manager.ToString().Split(' ');
 
-                    plPileLine.Stop();
+                        owner.Append(owners[0]);
+                        owner.Append('@');
+
+                        plPileLine.Stop();
+                    }
+                    else if (rsResultsresults.Count == 0)
+                    {
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("GetExternalDistributionListOwner ",
+                            Environment.NewLine,
+                            "DistributionListNotFound", Environment.NewLine, dl));
+                    }
+                    else
+                    {
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("GetExternalDistributionListOwner ",
+                            Environment.NewLine,
+                            "NonUniqueDistributionListFound", Environment.NewLine, dl));
+                    }
                 }
 
                 using (var plPileLine = runspace.CreatePipeline())
@@ -83,7 +102,7 @@ namespace Hummingbird.Core
                     rsResultsresults = plPileLine.Invoke();
 
                     var filteredDomainResults =
-                        rsResultsresults.Where(cr => ((string) cr.Properties["DomainType"].Value == "Authoritative"));
+                        rsResultsresults.Where(cr => ((string)cr.Properties["DomainType"].Value == "Authoritative"));
 
                     var authoritativeDomain = filteredDomainResults.First().Properties["DomainName"].Value;
 
@@ -123,90 +142,96 @@ namespace Hummingbird.Core
             var request = (HttpWebRequest) WebRequest.Create(exchangeUrl);
             request.Method = WebRequestMethods.Http.Post;
             request.Headers.Add(HttpRequestHeader.Authorization, string.Concat("Basic ", authHeaderContent));
+            request.UserAgent = "Hummingbird";
             request.ContentType = "text/xml";
 
             switch (requestType)
             {
                 case ExchangeRequestType.ValidateAlias:
-                {
-                    LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:ValidateAlias ", param));
-
-                    postContent = Resources.AliasValidationPOST.Replace(AppSetup.GroupIdFiller, param);
-                    type = typeof (AliasValidationEnvelope);
-                    break;
-                }
-                case ExchangeRequestType.CreateGroup:
-                {
-                    LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:CreateGroup ", param));
-
-                    postContent = Resources.GroupCreationPOST.Replace(AppSetup.GroupIdFiller, param);
-                    type = typeof (GroupCreationEnvelope);
-                    break;
-                }
-                case ExchangeRequestType.GetUnifiedGroupDetails:
-                {
-                    LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:GetGroupDetails ", param));
-
-                    postContent = Resources.GetUnifiedGroupsPOST.Replace(AppSetup.GroupSmtpFiller, param);
-                    type = typeof (GetUnifiedGroupEnvelope);
-
-                    break;
-                }
-                case ExchangeRequestType.DeleteGroup:
-                {
-                    postContent = Resources.DeleteGroupPOST;
-                    type = null;
-
-                    break;
-                }
-                case ExchangeRequestType.AddMember:
-                {
-                    LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:AddMember ", param));
-
-                    if (additionalParam != null)
                     {
-                        using (
-                            var addMemberEnvelopeStream =
-                                new MemoryStream(Encoding.UTF8.GetBytes(Resources.SetUnifiedGroupMembersPOST)))
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:ValidateAlias ", param));
+
+                        postContent = Resources.AliasValidationPOST.Replace(AppSetup.GroupIdFiller, param);
+                        type = typeof (AliasValidationEnvelope);
+                        break;
+                    }
+                case ExchangeRequestType.CreateGroup:
+                    {
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:CreateGroup ", param));
+
+                        postContent = Resources.GroupCreationPOST.Replace(AppSetup.GroupIdFiller, param);
+                        var additionalParamList = additionalParam != null ? additionalParam.ToList() : null;
+                        if (additionalParamList != null && additionalParamList.Count == 1)
                         {
-                            using (var reader = new StreamReader(addMemberEnvelopeStream))
+                            postContent = postContent.Replace(AppSetup.OwnerSmtpFiller, additionalParamList[0]);
+                        }
+                        type = typeof (GroupCreationEnvelope);
+                        break;
+                    }
+                case ExchangeRequestType.GetUnifiedGroupDetails:
+                    {
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:GetGroupDetails ", param));
+
+                        postContent = Resources.GetUnifiedGroupsPOST.Replace(AppSetup.GroupSmtpFiller, param);
+                        type = typeof (GetUnifiedGroupEnvelope);
+
+                        break;
+                    }
+                case ExchangeRequestType.DeleteGroup:
+                    {
+                        postContent = Resources.DeleteGroupPOST;
+                        type = null;
+
+                        break;
+                    }
+                case ExchangeRequestType.AddMember:
+                    {
+                        LoggingViewModel.Instance.Logger.Write(string.Concat("ExchangeConnector:AddMember ", param));
+
+                        if (additionalParam != null)
+                        {
+                            using (
+                                var addMemberEnvelopeStream =
+                                    new MemoryStream(Encoding.UTF8.GetBytes(Resources.SetUnifiedGroupMembersPOST)))
                             {
-                                var serializer = new XmlSerializer(typeof (AddMemberEnvelope));
-                                var deserializedContent = (AddMemberEnvelope) serializer.Deserialize(reader);
-
-                                deserializedContent.Body.SetUnifiedGroupMembershipState.Members =
-                                    new List<string>(additionalParam);
-                                deserializedContent.Body.SetUnifiedGroupMembershipState.GroupIdentity.Value = param;
-
-                                var ns = new XmlSerializerNamespaces();
-                                ns.Add("s", "http://schemas.xmlsoap.org/soap/envelope/");
-
-                                var xmlWriterSettings = new XmlWriterSettings {OmitXmlDeclaration = true};
-
-                                using (var textWriter = new StringWriter())
+                                using (var reader = new StreamReader(addMemberEnvelopeStream))
                                 {
-                                    using (var writer = XmlWriter.Create(textWriter, xmlWriterSettings))
+                                    var serializer = new XmlSerializer(typeof (AddMemberEnvelope));
+                                    var deserializedContent = (AddMemberEnvelope) serializer.Deserialize(reader);
+
+                                    deserializedContent.Body.SetUnifiedGroupMembershipState.Members =
+                                        new List<string>(additionalParam);
+                                    deserializedContent.Body.SetUnifiedGroupMembershipState.GroupIdentity.Value = param;
+
+                                    var ns = new XmlSerializerNamespaces();
+                                    ns.Add("s", "http://schemas.xmlsoap.org/soap/envelope/");
+
+                                    var xmlWriterSettings = new XmlWriterSettings { OmitXmlDeclaration = true };
+
+                                    using (var textWriter = new StringWriter())
                                     {
-                                        serializer.Serialize(writer, deserializedContent, ns);
+                                        using (var writer = XmlWriter.Create(textWriter, xmlWriterSettings))
+                                        {
+                                            serializer.Serialize(writer, deserializedContent, ns);
 
-                                        postContent = textWriter.ToString();
+                                            postContent = textWriter.ToString();
 
-                                        LoggingViewModel.Instance.Logger.Write(
-                                            string.Concat("ExchangeConnector:AddMemberPostContent ", postContent));
+                                            LoggingViewModel.Instance.Logger.Write(
+                                                string.Concat("ExchangeConnector:AddMemberPostContent ", postContent));
 
-                                        type = typeof (SetMemberEnvelope);
+                                            type = typeof (SetMemberEnvelope);
+                                        }
                                     }
                                 }
                             }
                         }
+                        else
+                        {
+                            throw new ArgumentNullException("additionalParam",
+                                Resources.ExchangeRequestAddMembersWithoutMembers);
+                        }
+                        break;
                     }
-                    else
-                    {
-                        throw new ArgumentNullException("additionalParam",
-                            Resources.ExchangeRequestAddMembersWithoutMembers);
-                    }
-                    break;
-                }
             }
 
             var processedPostContent = Encoding.UTF8.GetBytes(postContent);

@@ -48,7 +48,48 @@ namespace Hummingbird.Core.Common
                     exception.Message, Environment.NewLine,
                     exception.StackTrace, Environment.NewLine, string.Join(",", distributionList.Members.ToArray()),
                     Environment.NewLine,
-                    distributionList.Owner));
+                    distributionList.Name));
+
+                path = string.Empty;
+            }
+
+            return path;
+        }
+
+        /// <summary>
+        /// Stores the DL invalid members info in a local file.
+        /// </summary>
+        /// <param name="distributionList">Existing distribution list model.</param>
+        /// <param name="actionName">Name of the flow attempting to write a failure list</param>
+        /// <param name="errorDetails">Add Members details to be written</param>
+        /// <returns></returns>
+        internal string StoreDistributionListFailures(DistributionList distributionList, string actionName, AddMembersErrorDetails errorDetails)
+        {
+            string path;
+
+            try
+            {
+                var directory = Directory.CreateDirectory(AppPath);
+
+                var serializer = new XmlSerializer(typeof(AddMembersErrorDetails));
+                path = Path.Combine(directory.FullName, distributionList.Name + "_" + actionName + "_Failures.xmldl");
+
+                using (var writer = new StreamWriter(path))
+                {
+                    serializer.Serialize(writer, errorDetails);
+                }
+
+                LoggingViewModel.Instance.Logger.Write(string.Concat("StoreDistributionListInvalidMembers:OK ", path,
+                    Environment.NewLine,
+                    distributionList.Name));
+            }
+            catch (Exception exception)
+            {
+                LoggingViewModel.Instance.Logger.Write(string.Concat("StoreDistributionListInvalidMembers:Error ",
+                    exception.Message, Environment.NewLine,
+                    exception.StackTrace,
+                    Environment.NewLine,
+                    distributionList.Name));
 
                 path = string.Empty;
             }

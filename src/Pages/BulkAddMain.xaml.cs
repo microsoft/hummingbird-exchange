@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,7 +37,7 @@ namespace Hummingbird.Pages
 
         private void BtnOpenDlFile_OnClick(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog {Filter = "XML DL Files (*.xmldl) | *.xmldl"};
+            var openFileDialog = new OpenFileDialog { Filter = "XML DL Files (*.xmldl) | *.xmldl" };
             var result = openFileDialog.ShowDialog();
 
             if (result != true) return;
@@ -68,19 +69,18 @@ namespace Hummingbird.Pages
                     var credManager = new CredentialManager();
                     var credentials = credManager.GetUserCredentials();
 
-                    var membersAdded = await AddMembersToGroup(credentials, TxtGroupAddress.Text,
+                    BulkAddMembersResult[] addMembersResults = await AddMembersToGroup(credentials, TxtGroupAddress.Text,
                         DlGroupMigrationViewModel.Instance.BulkAddDistributionList.Members.ToList());
+                    DlGroupMigrationViewModel.Instance.BulkAddDistributionList.Name = TxtGroupAddress.Text;
 
-                    Func<BulkAddMembersResult, bool> isResultSuccessful = r => r.StatusCode.Equals("noerror", StringComparison.InvariantCultureIgnoreCase);
+                    int totalMembersCount = DlGroupMigrationViewModel.Instance.BulkAddDistributionList.Members.Count;
+                    int failedMemberCount = addMembersResults.Where(r => r.FailedMembers != null).Sum(r => r.FailedMembers.Count);
+                    int invalidMemberCount = addMembersResults.Where(r => r.InvalidMembers != null).Sum(r => r.InvalidMembers.Count);
+                    int successfulMembersCount = totalMembersCount - (invalidMemberCount + failedMemberCount);
 
-                    int successfulMemberCount = membersAdded.Where(r => isResultSuccessful(r))
-                                                            .Sum(r => r.MemberCount);
-                    int failedMemberCount = membersAdded.Where(r => !isResultSuccessful(r))
-                                                        .Sum(r => r.MemberCount);
-
-                    if (failedMemberCount == 0)
+                    if (addMembersResults.All(x => x.StatusCode.ToLower() == "noerror"))
                     {
-                        string message = string.Format("Bulk add complete! Added {0} members.", successfulMemberCount);
+                        string message = string.Format("The bulk add was successful. {0} members were added.", totalMembersCount);
 
                         ModernDialog.ShowMessage(
                             message,
@@ -91,37 +91,65 @@ namespace Hummingbird.Pages
                         TxtPath.Text = string.Empty;
                         DlGroupMigrationViewModel.Instance.BulkAddDistributionList = new DistributionList();
                     }
-                    else if (successfulMemberCount == 0)
+                    else
                     {
+                        StringBuilder message = new StringBuilder();
+
+                        if (successfulMembersCount > 0)
+                        {
+                            message.Append("Bulk add was partially successful.");
+                            message.Append(string.Format(" {0} member{1} added successfully.", successfulMembersCount, successfulMembersCount > 1 ? "s were" : " was"));
+                        }
+
+                        if (failedMemberCount > 0)
+                        {
+                            message.Append(string.Format(" {0} member{1} addition failed.", failedMemberCount, failedMemberCount > 1 ? "s" : string.Empty));
+                        }
+
+                        if (invalidMemberCount > 0)
+                        {
+                            message.Append(string.Format(" {0} member{1} invalid.", invalidMemberCount, invalidMemberCount > 1 ? "s were" : " was"));
+                        }
+
                         ModernDialog.ShowMessage(
-                            "An error occurred and we couldn't complete the request. Please contact the developer.",
+                            message.ToString(),
                             "Hummingbird",
                             MessageBoxButton.OK);
-                    }
-                    else // failed > 0 and successful > 0
-                    {
-                        var errorCodes = membersAdded.Where(r => !isResultSuccessful(r))
-                            .Select(r => r.StatusCode)
-                            .Distinct()
-                            .JoinStrings(",");
 
-                        string message = string.Format(
-                            "Bulk add was partially successful. We added {0} members but {1} failed due to an error. Error codes: {2}",
-                            successfulMemberCount,
-                            failedMemberCount,
-                            errorCodes);
+                        var fsOperator = new FileSystemOperator();
+                        AddMembersErrorDetails error = new AddMembersErrorDetails
+                        {
+                            FailedMembers = new List<string>(),
+                            InvalidMembers = new List<string>()
+                        };
+                        foreach (var list in addMembersResults)
+                        {
+                            if (list.FailedMembers != null) { error.FailedMembers.AddRange(list.FailedMembers); }
+                            if (list.InvalidMembers != null) { error.InvalidMembers.AddRange(list.InvalidMembers); }
+                        }
 
-                        ModernDialog.ShowMessage(
-                            message,
-                            "Hummingbird",
-                            MessageBoxButton.OK);
+                        var filePath = fsOperator.StoreDistributionListFailures(DlGroupMigrationViewModel.Instance.BulkAddDistributionList, "BulkAdd", error);
+
+                        if (!string.IsNullOrWhiteSpace(filePath))
+                        {
+                            var result =
+                                ModernDialog.ShowMessage(
+                                    "A list of failures was created. Do you want to open File Explorer to find its location?",
+                                    "Hummingbird", MessageBoxButton.YesNo);
+
+                            if (result == MessageBoxResult.Yes)
+                            {
+                                Process.Start("explorer.exe", string.Concat("/select, ", filePath));
+                            }
+                        }
+
                     }
 
                 }
                 catch (Exception)
                 {
                     ModernDialog.ShowMessage(
-                        "An error occurred and we couldn't complete the request. Please contact the developer.",
+                        "Members couldn't be added from the backup file. The alias may be invalid or there might be a problem connecting to the server. Please try again later.",
                         "Hummingbird",
                         MessageBoxButton.OK);
                 }
@@ -140,16 +168,18 @@ namespace Hummingbird.Pages
             List<string> members)
         {
             var tasks = new List<Task<BulkAddMembersResult>>();
+            var results = new List<BulkAddMembersResult>();
 
             for (int i = 0; i < members.Count; i += AddMembersBatchSize)
             {
                 IEnumerable<string> membersForBatch = members.Skip(i).Take(AddMembersBatchSize);
-                tasks.Add(Task.Run(() => AddMembersToGroupSingleBatch(credentials, alias, membersForBatch)));
+                var task = Task.Run(() => AddMembersToGroupSingleBatch(credentials, alias, membersForBatch));
+                results.Add(await task);
             }
-            
-            return await Task.WhenAll(tasks.ToArray());
+
+            return results.ToArray();
         }
-        
+
         private static BulkAddMembersResult AddMembersToGroupSingleBatch(UserCredentials credentials, string alias,
             IEnumerable<string> members)
         {
@@ -159,16 +189,29 @@ namespace Hummingbird.Pages
             IExchangeResponse result = connector.PerformExchangeRequest(credentials,
                 AccountSettingsViewModel.Instance.ServerUrl, alias, ExchangeRequestType.AddMember, memberList);
 
-            return new BulkAddMembersResult
+            var addMemberResult = new BulkAddMembersResult
             {
                 StatusCode = result != null
-                    ? ((SetMemberEnvelope) result).Body.SetUnifiedGroupMembershipResponseMessage.ResponseCode
+                    ? ((SetMemberEnvelope)result).Body.SetUnifiedGroupMembershipResponseMessage.ResponseCode
                     : string.Empty,
 
                 MemberCount = memberList.Count
             };
+
+            if (addMemberResult.StatusCode.ToLower() != "noerror" && addMemberResult.StatusCode.ToLower() != "errorinvalidid")
+            {
+                addMemberResult.FailedMembers = memberList;
+            }
+            else if (result != null)
+            {
+                addMemberResult.FailedMembers = ((SetMemberEnvelope)result).Body.SetUnifiedGroupMembershipResponseMessage.FailedMembers;
+
+                addMemberResult.InvalidMembers = ((SetMemberEnvelope)result).Body.SetUnifiedGroupMembershipResponseMessage.InvalidMembers;
+            }
+
+            return addMemberResult;
         }
-        
+
         private async void BtnPerformGroupGrab_OnClick(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(TxtBackupGroupBox.Text))
@@ -257,6 +300,8 @@ namespace Hummingbird.Pages
         {
             public string StatusCode { get; set; }
             public int MemberCount { get; set; }
+            public List<string> FailedMembers { get; set; }
+            public List<string> InvalidMembers { get; set; }
         }
     }
 }

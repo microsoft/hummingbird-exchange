@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,11 +27,13 @@ namespace Hummingbird.Pages
     {
         private readonly DispatcherTimer _timer;
 
+        private const int MemberAddBatchSize = 225;
+
         public DlGroupMigrationMain()
         {
             InitializeComponent();
 
-            _timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
+            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1)};
             _timer.Tick += _timer_Tick;
         }
 
@@ -80,36 +83,46 @@ namespace Hummingbird.Pages
                     var adConnector = new ActiveDirectoryConnector();
                     var dl = new DistributionList {Name = TxtDlAlias.Text};
                     var owner = string.Empty;
-
+                    bool isValidDl;
                     if (!AccountSettingsViewModel.Instance.IsInternal)
                     {
                         // The user is external.
                         var connector = new ExchangeConnector();
-                        owner = connector.GetExternalDistributionListOwner(TxtDlAlias.Text, userCredentials);
+                        owner = connector.GetExternalDistributionListOwner(TxtDlAlias.Text, userCredentials, out isValidDl);
                     }
                     else
                     {
                         // The user is internal
-                        owner = await adConnector.GetDistributionListOwner(TxtDlAlias.Text);
+                        var dlDetails = await adConnector.GetDistributionListOwner(TxtDlAlias.Text);
+                        owner = dlDetails.Item1;
+                        isValidDl = dlDetails.Item2;
                     }
 
                     bool resolveMembers = !string.IsNullOrWhiteSpace(owner);
-                    if (!resolveMembers)
+
+                    if (!isValidDl)
                     {
                         var result =
                             ModernDialog.ShowMessage(
-                                "The group owner could not be found. Would you like to attempt to retrieve members anyway? The backup will be missing the Owner property.",
+                                "The alias you provided doesn't map to a valid DL.",
+                                "Hummingbird", MessageBoxButton.OK);
+                        resolveMembers = false;
+                    }
+                    else if (!resolveMembers)
+                    {
+                        var result =
+                            ModernDialog.ShowMessage(
+                                "The group owner couldn't be found. If you attempt to retrieve members for the group, the backup will be missing the Owner property. Continue?",
                                 "Hummingbird", MessageBoxButton.YesNo);
-
                         resolveMembers = result == MessageBoxResult.Yes;
                     }
 
                     if (resolveMembers)
                     {
                         dl.Owner = owner;
-                        
+
                         TxtBackupStatus.Text = "getting members...";
-                        
+
                         var members = await adConnector.GetDistributionListMembers(TxtDlAlias.Text);
                         if (members != null)
                         {
@@ -122,7 +135,7 @@ namespace Hummingbird.Pages
                             {
                                 var result =
                                     ModernDialog.ShowMessage(
-                                        "Distribution list backup created. Open Windows Explorer for its location?",
+                                        "A backup was created for the distribution list. Do you want to open File Explorer to find its location?",
                                         "Hummingbird", MessageBoxButton.YesNo);
 
                                 if (result == MessageBoxResult.Yes)
@@ -133,14 +146,14 @@ namespace Hummingbird.Pages
                             else
                             {
                                 ModernDialog.ShowMessage(
-                                    "We couldn't create the backup file for this distribution list.", "Hummingbird",
+                                    "We couldn't create a backup file for this distribution list. Please try again.", "Hummingbird",
                                     MessageBoxButton.OK);
                             }
                         }
                         else
                         {
                             ModernDialog.ShowMessage(
-                                "We couldn't get distribution list members. Check your credentials.", "Hummingbird",
+                                "We couldn't retrieve members of the distribution list. Check your credentials and try again.", "Hummingbird",
                                 MessageBoxButton.OK);
                         }
                     }
@@ -152,13 +165,13 @@ namespace Hummingbird.Pages
                 else
                 {
                     ModernDialog.ShowMessage(
-                        "There are no user credentials provided. Open SETTINGS and add your credentials.", "Hummingbird",
+                        "No credentials were provided. Open Settings and add your credentials.", "Hummingbird",
                         MessageBoxButton.OK);
                 }
             }
             else
             {
-                ModernDialog.ShowMessage("Alias cannot be empty!", "Hummingbird", MessageBoxButton.OK);
+                ModernDialog.ShowMessage("You must include an alias.", "Hummingbird", MessageBoxButton.OK);
             }
         }
 
@@ -186,11 +199,11 @@ namespace Hummingbird.Pages
                                 DlGroupMigrationViewModel.Instance.RestoreControlsEnabled = false;
                                 TxtBackupStatus.Text = "creating group...";
 
-                                var groupCreated = await CreateGroup(credentials, TxtGroupAlias.Text);
+                                var groupCreated = await CreateGroup(credentials, TxtGroupAlias.Text, DlGroupMigrationViewModel.Instance.CurrentlyActiveDl.Owner);
 
                                 if (!string.IsNullOrWhiteSpace(groupCreated))
                                 {
-                                    ModernDialog.ShowMessage("Group creation complete!", "Hummingbird",
+                                    ModernDialog.ShowMessage(string.Format("Your group was created successfully. SMTP address: {0}", groupCreated), "Hummingbird",
                                         MessageBoxButton.OK);
                                 }
 
@@ -203,20 +216,87 @@ namespace Hummingbird.Pages
                             DlGroupMigrationViewModel.Instance.BackupControlsEnabled = false;
                             DlGroupMigrationViewModel.Instance.RestoreControlsEnabled = false;
                             TxtBackupStatus.Text = "creating group...";
+                            bool operationFailed = false;
+                            List<string> invalidMembers = new List<string>();
 
-                            var groupCreated = await CreateGroup(credentials, TxtGroupAlias.Text);
+                            var groupCreated = await CreateGroup(credentials, TxtGroupAlias.Text, DlGroupMigrationViewModel.Instance.CurrentlyActiveDl.Owner);
 
-                            if (!string.IsNullOrEmpty(groupCreated))
+                            if (string.IsNullOrEmpty(groupCreated))
+                            {
+                                operationFailed = true;
+                                ModernDialog.ShowMessage(string.Format("The group couldn't be created. Please try migrating again later."), "Hummingbird",
+                                                MessageBoxButton.OK);
+                            }
+                            else
                             {
                                 TxtBackupStatus.Text = "adding members...";
+                                Collection<string> members = DlGroupMigrationViewModel.Instance.CurrentlyActiveDl.Members;
 
-                                var membersAdded = await AddMembersToGroup(credentials, groupCreated,
-                                    DlGroupMigrationViewModel.Instance.CurrentlyActiveDl.Members.ToList());
-
-                                if (membersAdded.ToLower() == "noerror")
+                                for (int i = 0; i < members.Count; i += DlGroupMigrationMain.MemberAddBatchSize)
                                 {
-                                    ModernDialog.ShowMessage("Group creation complete!", "Hummingbird",
-                                        MessageBoxButton.OK);
+                                    IEnumerable<string> membersToAddInABatch = members.Skip(i).Take(DlGroupMigrationMain.MemberAddBatchSize);
+                                    var membersAddedResponse = await AddMembersToGroup(credentials, groupCreated, membersToAddInABatch);
+
+                                    if (membersAddedResponse != null && membersAddedResponse.Body.SetUnifiedGroupMembershipResponseMessage != null)
+                                    {
+                                        if (membersAddedResponse.Body.SetUnifiedGroupMembershipResponseMessage.ResponseCode.ToLower() == "noerror")
+                                        {
+                                            continue;
+                                        }
+                                        else if (membersAddedResponse.Body.SetUnifiedGroupMembershipResponseMessage.ResponseCode.ToLower() == "errorinvalidid" &&
+                                            membersAddedResponse.Body.SetUnifiedGroupMembershipResponseMessage.FailedMembers.Count == 0)
+                                        {
+                                            invalidMembers.AddRange(membersAddedResponse.Body.SetUnifiedGroupMembershipResponseMessage.InvalidMembers);
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            operationFailed = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        operationFailed = true;
+                                    }
+
+                                    if (operationFailed)
+                                    {
+                                        ModernDialog.ShowMessage(string.Format(@"The group was created, but not all the members were added. Please go to 'bulk add' to add the missing members using the original backup and the following group address {0}.", groupCreated), "Hummingbird",
+                                            MessageBoxButton.OK);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!operationFailed)
+                            {
+                                if (invalidMembers.Count == 0)
+                                {
+                                    ModernDialog.ShowMessage(string.Format("Your group was created successfully. SMTP address: {0}.", groupCreated), "Hummingbird",
+                                                MessageBoxButton.OK);
+                                }
+                                else
+                                {
+                                    ModernDialog.ShowMessage("The group was created but invalid members weren't added.", "Hummingbird",
+                                                MessageBoxButton.OK);
+
+                                    var fsOperator = new FileSystemOperator();
+                                    AddMembersErrorDetails error = new AddMembersErrorDetails();
+                                    error.InvalidMembers = invalidMembers;
+                                    var filePath = fsOperator.StoreDistributionListFailures(DlGroupMigrationViewModel.Instance.CurrentlyActiveDl, "Create", error);
+
+                                    if (!string.IsNullOrWhiteSpace(filePath))
+                                    {
+                                        var result =
+                                            ModernDialog.ShowMessage(
+                                                "The list of invalid members was created. Do you want to open File Explorer to find its location?",
+                                                "Hummingbird", MessageBoxButton.YesNo);
+
+                                        if (result == MessageBoxResult.Yes)
+                                        {
+                                            Process.Start("explorer.exe", string.Concat("/select, ", filePath));
+                                        }
+                                    }
                                 }
                             }
 
@@ -226,19 +306,20 @@ namespace Hummingbird.Pages
                     }
                     else
                     {
-                        ModernDialog.ShowMessage("Looks like you don't have any credentials associated.", "Hummingbird",
+                        ModernDialog.ShowMessage("No credentials were provided. Open Settings and add your credentials.", "Hummingbird",
                             MessageBoxButton.OK);
                     }
                 }
                 else
                 {
-                    ModernDialog.ShowMessage("Looks like an invalid alias or we can't reach the server at this time.",
-                        "Hummingbird", MessageBoxButton.OK);
+                    ModernDialog.ShowMessage("The group couldn't be created from the backup file. The alias may be invalid or there might be a problem connecting to the server. Please try again later.",
+                        "Hummingbird",
+                         MessageBoxButton.OK);
                 }
             }
             else
             {
-                ModernDialog.ShowMessage("Alias cannot be empty!", "Hummingbird", MessageBoxButton.OK);
+                ModernDialog.ShowMessage("You must include an alias.", "Hummingbird", MessageBoxButton.OK);
             }
 
             DlGroupMigrationViewModel.Instance.CurrentlyActiveDl = null;
@@ -246,7 +327,7 @@ namespace Hummingbird.Pages
             TxtPath.Text = string.Empty;
         }
 
-        private static async Task<string> CreateGroup(UserCredentials credentials, string alias)
+        private static async Task<string> CreateGroup(UserCredentials credentials, string alias, string owner)
         {
             IExchangeResponse result = null;
 
@@ -255,28 +336,28 @@ namespace Hummingbird.Pages
                 var connector = new ExchangeConnector();
 
                 result = connector.PerformExchangeRequest(credentials,
-                    AccountSettingsViewModel.Instance.ServerUrl, alias, ExchangeRequestType.CreateGroup);
+                    AccountSettingsViewModel.Instance.ServerUrl, alias, ExchangeRequestType.CreateGroup, new List<string> { owner });
             });
 
 
             if (result != null)
             {
-                if (
-                    ((GroupCreationEnvelope) result).Body.CreateUnifiedGroupResponseMessage.GroupIdentity.Type.ToLower() ==
-                    "smtpaddress")
+                if (((GroupCreationEnvelope)result).Body.CreateUnifiedGroupResponseMessage.GroupIdentity != null &&
+                    ((GroupCreationEnvelope)result).Body.CreateUnifiedGroupResponseMessage.GroupIdentity.Type.ToLower() == "smtpaddress")
                 {
-                    return ((GroupCreationEnvelope) result).Body.CreateUnifiedGroupResponseMessage.GroupIdentity.Value;
+                    return ((GroupCreationEnvelope)result).Body.CreateUnifiedGroupResponseMessage.GroupIdentity.Value;
                 }
                 return string.Empty;
             }
             return string.Empty;
         }
 
-        private static async Task<string> AddMembersToGroup(UserCredentials credentials, string alias,
-            List<string> members)
+        private static async Task<SetMemberEnvelope> AddMembersToGroup(UserCredentials credentials, string alias,
+            IEnumerable<string> members)
         {
             IExchangeResponse result = null;
 
+            // add a loop here and add add error messages
             await Task.Run(() =>
             {
                 var connector = new ExchangeConnector();
@@ -285,9 +366,7 @@ namespace Hummingbird.Pages
                     AccountSettingsViewModel.Instance.ServerUrl, alias, ExchangeRequestType.AddMember, members);
             });
 
-            return result != null
-                ? ((SetMemberEnvelope) result).Body.SetUnifiedGroupMembershipResponseMessage.ResponseCode
-                : string.Empty;
+            return (SetMemberEnvelope)result;
         }
 
         private void TxtGroupAlias_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -319,7 +398,7 @@ namespace Hummingbird.Pages
 
         private void BtnOpenDlFile_OnClick(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog {Filter = "XML DL Files (*.xmldl) | *.xmldl"};
+            var openFileDialog = new OpenFileDialog { Filter = "XML DL Files (*.xmldl) | *.xmldl"};
             var result = openFileDialog.ShowDialog();
 
             if (result != true) return;
