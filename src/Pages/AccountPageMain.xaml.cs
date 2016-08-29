@@ -14,6 +14,7 @@ namespace Hummingbird.Pages
         public AccountPageMain()
         {
             InitializeComponent();
+            AccountSettingsViewModel.Instance.ServerUrl = @"https://outlook.office365.com/EWS/Exchange.asmx";
         }
 
         private void btnSaveCredentials_Click(object sender, RoutedEventArgs e)

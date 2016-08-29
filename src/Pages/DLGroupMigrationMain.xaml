@@ -11,32 +11,32 @@
         <ScrollViewer>
             <StackPanel MinWidth="200">                
                 <StackPanel>
-                    <TextBlock Text="STEP 1: BACKUP DISTRIBUTION LIST" Style="{StaticResource Heading2}"></TextBlock>
-                    <TextBlock TextWrapping="Wrap" Text="this will create a local copy of the distribution list with all the associated members and owner. nested distribution lists will be expanded."></TextBlock>
-                    <TextBlock Style="{StaticResource Title}" Text="alias" Margin="0,12,0,0"></TextBlock>
+                    <TextBlock Text="Step 1: Back up distribution list" Style="{StaticResource Heading2}"></TextBlock>
+                    <TextBlock TextWrapping="Wrap" Text="This will create a local copy of the distribution list, including all associated members and the owner. Nested DLs will be expanded."></TextBlock>
+                    <TextBlock Style="{StaticResource Title}" Text="Alias of DL" FontSize="15" Margin="0,12,0,0"></TextBlock>
                     <TextBox IsEnabled="{Binding BackupControlsEnabled}" Width="220" HorizontalAlignment="Left" Margin="0,0,0,8" x:Name="TxtDlAlias"/>
-                    <Button IsEnabled="{Binding BackupControlsEnabled}" Content="create backup" Width="150" HorizontalAlignment="Left" x:Name="BtnCreateBackup" Click="btnCreateBackup_Click" Margin="0,8,0,0"></Button>
+                    <Button IsEnabled="{Binding BackupControlsEnabled}" Content="Create backup" Width="150" HorizontalAlignment="Left" x:Name="BtnCreateBackup" Click="btnCreateBackup_Click" Margin="0,8,0,0"></Button>
                 </StackPanel>
 
                 <StackPanel Margin="0,24,0,0">
-                    <TextBlock Text="STEP 2: CREATE GROUP FROM DL BACKUP" Style="{StaticResource Heading2}"></TextBlock>
-                    <TextBlock TextWrapping="Wrap" Text="this will create a new group with all distribution list members added."></TextBlock>
-                    <TextBlock Style="{StaticResource Title}" Text="backup path" Margin="0,12,0,0"></TextBlock>
+                    <TextBlock Text="Step 2: Create group from distribution list back up" Style="{StaticResource Heading2}"></TextBlock>
+                    <TextBlock TextWrapping="Wrap" Text="This will create a new group with all members of the distribution list included."></TextBlock>
+                    <TextBlock Style="{StaticResource Title}" Text="Backup path" FontSize="15" Margin="0,12,0,0"></TextBlock>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBox x:Name="TxtPath" IsReadOnly="True" IsReadOnlyCaretVisible="True" Width="220" HorizontalAlignment="Left"/>
-                        <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnOpenDlFile" Click="BtnOpenDlFile_OnClick" Content="browse..." Width="150" Margin="8,0,0,0"></Button>
+                        <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnOpenDlFile" Click="BtnOpenDlFile_OnClick" Content="Browse..." Width="150" Margin="8,0,0,0"></Button>
                     </StackPanel>
 
-                    <TextBlock Style="{StaticResource Title}" Text="alias" Margin="0,12,0,0"></TextBlock>
+                    <TextBlock Style="{StaticResource Title}" Text="Group alias" FontSize="15" Margin="0,12,0,0"></TextBlock>
                     <StackPanel Orientation="Horizontal">
                         <TextBox x:Name="TxtGroupAlias" Text="{Binding CurrentlyActiveDl.Name, Mode=TwoWay}" TextChanged="TxtGroupAlias_OnTextChanged"  IsEnabled="{Binding RestoreControlsEnabled}" Width="220" HorizontalAlignment="Left" Margin="0,0,0,8"/>
                         <Image Source="{Binding IsAliasValid, Converter={StaticResource AliasValidToImageConverter}}" Margin="12,-6,0,0" Stretch="UniformToFill" Height="16" Width="16" x:Name="ImgStatus"></Image>
                     </StackPanel>
-                    
-                    <TextBlock Style="{StaticResource Title}" Text="members" Margin="0,12,0,0"></TextBlock>
-                    <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnViewMembers" Click="BtnViewMembers_OnClick" Content="view members" Width="150" HorizontalAlignment="Left" Margin="0,8,0,0"></Button>
-                    <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnCreateGroup" Click="BtnCreateGroup_OnClick" Content="create group" Width="150" HorizontalAlignment="Left" Margin="0,8,0,0"></Button>
+
+                    <TextBlock Style="{StaticResource Title}" Text="Members" FontSize="15" Margin="0,12,0,0"></TextBlock>
+                    <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnViewMembers" Click="BtnViewMembers_OnClick" Content="View members" Width="150" HorizontalAlignment="Left" Margin="0,8,0,0"></Button>
+                    <Button IsEnabled="{Binding RestoreControlsEnabled}" x:Name="BtnCreateGroup" Click="BtnCreateGroup_OnClick" Content="Create group" Width="150" HorizontalAlignment="Left" Margin="0,8,0,0"></Button>
                    
                     <!--<Button Background="Red" x:Name="BtnTest" Click="BtnTest_Click">TEST - BIG RED BUTTON</Button>-->
                 </StackPanel>

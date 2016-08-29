@@ -9,7 +9,7 @@
         <Value>##GROUP_SMTP_ADDRESS##</Value>
       </GroupIdentity>
       <GroupMembersResponseShape xmlns="http://schemas.microsoft.com/exchange/services/2006/types">Members</GroupMembersResponseShape>
-      <MembersPaging a:type="IndexedPageFolderView" MaxEntriesReturned="500" Offset="0" BasePoint="Beginning" xmlns="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:a="http://www.w3.org/2001/XMLSchema-instance"/>
+      <MembersPaging a:type="IndexedPageFolderView" MaxEntriesReturned="2000" Offset="0" BasePoint="Beginning" xmlns="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:a="http://www.w3.org/2001/XMLSchema-instance"/>
       <MembersSortOrder xmlns="http://schemas.microsoft.com/exchange/services/2006/types">OwnerAndDisplayName</MembersSortOrder>
     </GetUnifiedGroupMembers>
   </s:Body>

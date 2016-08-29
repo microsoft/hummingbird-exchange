@@ -97,18 +97,18 @@ namespace Hummingbird.Pages
 
                         if (successfulMembersCount > 0)
                         {
-                            message.Append("Bulk add was partially successful.");
-                            message.Append(string.Format(" {0} member{1} added successfully.", successfulMembersCount, successfulMembersCount > 1 ? "s were" : " was"));
+                            message.Append("The bulk add was partially successful.");
+                            message.Append(string.Format("\nNumber of members added successfully: {0}.", successfulMembersCount));
                         }
 
                         if (failedMemberCount > 0)
                         {
-                            message.Append(string.Format(" {0} member{1} addition failed.", failedMemberCount, failedMemberCount > 1 ? "s" : string.Empty));
+                            message.Append(string.Format("\nNumber of members not added: {0}.", failedMemberCount));
                         }
 
                         if (invalidMemberCount > 0)
                         {
-                            message.Append(string.Format(" {0} member{1} invalid.", invalidMemberCount, invalidMemberCount > 1 ? "s were" : " was"));
+                            message.Append(string.Format("\nNumber of invalid members: {0}.", invalidMemberCount));
                         }
 
                         ModernDialog.ShowMessage(
@@ -157,7 +157,7 @@ namespace Hummingbird.Pages
             else
             {
                 ModernDialog.ShowMessage(
-                    "Missing key pieces of information. Check that you have both the members and group address entered.",
+                    "Make sure you've added both the DL backup file name and the group address (SMTP address).",
                     "Hummingbird", MessageBoxButton.OK);
             }
 
