@@ -8,7 +8,7 @@
       <Alias>##GROUPID##</Alias>
       <AccessType xmlns="http://schemas.microsoft.com/exchange/services/2006/types">Public</AccessType>
       <Description/>
-      <AutoSubscribeNewMembers>false</AutoSubscribeNewMembers>
+      <AutoSubscribeNewMembers>true</AutoSubscribeNewMembers>
       <Owner>##OWNER_SMTP_ADDRESS##</Owner>
       <CultureName>en-US</CultureName>
       <ExchangeProvisioningOptions xmlns="http://schemas.microsoft.com/exchange/services/2006/types">

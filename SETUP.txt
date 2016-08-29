@@ -1,0 +1,5 @@
+Solution works with VS 2015.
+
+-- You may have to resolve the references explicitly by installing the appropriate Nuget packages.
+-- Create a temporaray Certificate for Signing. Solution --> properties --> Signing Tab
+-- The UI is using FirstFloor.ModernUI DLL (https://github.com/firstfloorsoftware/mui) with some customizations and is hence referring a DLL locally.

@@ -123,5 +123,44 @@ namespace Hummingbird.Core.Common
                 return null;
             }
         }
+
+        /// <summary>
+        /// Stores the DL alias and groups SMTP in a file.
+        /// </summary>
+        /// <param name="dlName">Name of the DL</param>
+        /// <returns>Path of the file.</returns>
+        internal string StoreGroupDetails(DlToGroupMapping mapping)
+        {
+            string path;
+
+            try
+            {
+                var directory = Directory.CreateDirectory(AppPath);
+
+                var serializer = new XmlSerializer(typeof(DlToGroupMapping));
+                path = Path.Combine(directory.FullName, "DlToGroupMapping.xmldl");
+
+                using (var writer = new StreamWriter(path))
+                {
+                    serializer.Serialize(writer, mapping);
+                }
+
+                LoggingViewModel.Instance.Logger.Write(string.Concat("StoreGroupDetails:OK", path,
+                    Environment.NewLine,
+                    mapping.GroupSMTPAddress));
+            }
+            catch (Exception exception)
+            {
+                LoggingViewModel.Instance.Logger.Write(string.Concat("StoreGroupDetails:Error",
+                    exception.Message, Environment.NewLine,
+                    exception.StackTrace,
+                    Environment.NewLine,
+                    mapping.GroupSMTPAddress));
+
+                path = string.Empty;
+            }
+
+            return path;
+        }
     }
 }

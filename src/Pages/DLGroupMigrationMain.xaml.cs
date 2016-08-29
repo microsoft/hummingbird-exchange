@@ -78,7 +78,7 @@ namespace Hummingbird.Pages
                     DlGroupMigrationViewModel.Instance.BackupControlsEnabled = false;
                     DlGroupMigrationViewModel.Instance.RestoreControlsEnabled = false;
 
-                    TxtBackupStatus.Text = "trying to identify alias...";
+                    TxtBackupStatus.Text = "Identifying alias...";
 
                     var adConnector = new ActiveDirectoryConnector();
                     var dl = new DistributionList {Name = TxtDlAlias.Text};
@@ -300,6 +300,15 @@ namespace Hummingbird.Pages
                                 }
                             }
 
+                            if (!string.IsNullOrEmpty(groupCreated))
+                            {
+                                var fsOperator = new FileSystemOperator();
+                                DlToGroupMapping mapping = new DlToGroupMapping();
+                                mapping.GroupSMTPAddress = groupCreated;
+                                mapping.DlAlias = this.aliasOfSelectedDl;
+                                fsOperator.StoreGroupDetails(mapping);
+                            }
+
                             DlGroupMigrationViewModel.Instance.BackupControlsEnabled = true;
                             DlGroupMigrationViewModel.Instance.RestoreControlsEnabled = true;
                         }
@@ -357,7 +366,7 @@ namespace Hummingbird.Pages
         {
             IExchangeResponse result = null;
 
-            // add a loop here and add add error messages
+            // add a loop here and add error messages
             await Task.Run(() =>
             {
                 var connector = new ExchangeConnector();
@@ -409,6 +418,7 @@ namespace Hummingbird.Pages
             var fileOperator = new FileSystemOperator();
 
             DlGroupMigrationViewModel.Instance.CurrentlyActiveDl = fileOperator.GetDistributionListInformation(path);
+            this.aliasOfSelectedDl = DlGroupMigrationViewModel.Instance.CurrentlyActiveDl.Name;
             DlGroupMigrationViewModel.Instance.CurrentlyActiveDl.Members.Add(
                 DlGroupMigrationViewModel.Instance.CurrentlyActiveDl.Owner);
         }
@@ -428,5 +438,7 @@ namespace Hummingbird.Pages
                     AccountSettingsViewModel.Instance.ServerUrl, string.Empty, ExchangeRequestType.DeleteGroup, null);
             });
         }
+
+        public string aliasOfSelectedDl { get; set; }
     }
 }

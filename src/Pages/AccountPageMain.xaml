@@ -8,24 +8,24 @@
     <Grid Style="{StaticResource ContentRoot}">
         <StackPanel>
             <StackPanel>
-                <TextBlock Text="CREDENTIALS" Style="{StaticResource Heading2}" Margin="0,0,0,8"/>
-                <TextBlock Style="{StaticResource Title}" Text="username"></TextBlock>
+                <TextBlock Text="Credentials"  Style="{StaticResource Heading2}" Margin="0,0,0,8"/>
+                <TextBlock Style="{StaticResource Title}" Text="Username" FontSize="15"></TextBlock>
                 <TextBox x:Name="TxtUsername" Width="200" HorizontalAlignment="Left" Margin="0,0,0,8"/>
-                <TextBlock Style="{StaticResource Title}" Text="password"></TextBlock>
+                <TextBlock Style="{StaticResource Title}" Text="Password" FontSize="15"></TextBlock>
                 <PasswordBox x:Name="TxtPassword" Width="200" HorizontalAlignment="Left" Margin="0,0,0,32"/>
-                <Button x:Name="BtnSaveCredentials" Click="btnSaveCredentials_Click" Content="save credentials" Width="180" HorizontalAlignment="Left" Margin="0,0,0,8" />
+                <Button x:Name="BtnSaveCredentials" Click="btnSaveCredentials_Click" Content="Save credentials" Width="180" HorizontalAlignment="Left" Margin="0,0,0,8" />
             </StackPanel>
             
             <StackPanel Margin="0,16,0,0">
-                <TextBlock Text="SERVER" Style="{StaticResource Heading2}" Margin="0,0,0,8"/>
-                <TextBlock Style="{StaticResource Title}" Text="url"></TextBlock>
+                <TextBlock Text="Server" Style="{StaticResource Heading2}" Margin="0,0,0,8"/>
+                <TextBlock Style="{StaticResource Title}" Text="Url" FontSize="15"></TextBlock>
                 <TextBox Text="{Binding ServerUrl,Mode=TwoWay}" Width="200" HorizontalAlignment="Left" Margin="0,0,0,8"/>
-                <TextBlock Style="{StaticResource Title}" Text="target"></TextBlock>
+                <TextBlock Style="{StaticResource Title}" Text="Target" FontSize="15"></TextBlock>
                 <!-- Internal: Uses AD to fetch the DL details and is meant to be used by users whose have access to DL. Active Directory lookup settings needs to be updated in this case in AppSetup.cs -->
                 <RadioButton Content="Internal" IsChecked="{Binding IsInternal,Mode=TwoWay}" Margin="0,4,0,0"></RadioButton>
                 <!-- External: Uses Cmdlets to fetch the DL details and is meant to be used by any tenant admin -->
                 <RadioButton Content="External" IsChecked="{Binding IsInternal,Mode=TwoWay,Converter={StaticResource InverseBooleanConverter}}" Margin="0,4,0,0"></RadioButton>
-                <Button Content="save server settings" Width="180" HorizontalAlignment="Left" Margin="0,12,0,0" x:Name="BtnSaveSettings" Click="btnSaveSettings_Click"></Button>
+                <Button Content="Save server settings" Width="180" HorizontalAlignment="Left" Margin="0,12,0,0" x:Name="BtnSaveSettings" Click="btnSaveSettings_Click"></Button>
             </StackPanel>
         </StackPanel>
     </Grid>
