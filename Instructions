@@ -1,0 +1,74 @@
+Build the code and open the hummingbird exe.
+Save your credentials and server settings 
+In Settings, do the following: 
+1.       Under Credentials, add the user name(Example: tonysmit@contoso.com) and password you use for your work account.  
+2.       Click Save credentials.  
+3.        Under Server:  
+a.       Under URL, the following URL should appear automatically: https://outlook.office365.com/EWS/Exchange.asmx. If it doesn’t, paste it in the box. 
+b.       Choose Internal if you work at Microsoft. 
+c.       Otherwise, choose External. 
+4.       Click Save server settings. 
+
+ Create a backup of your distribution list 
+On the Distribution list tab, under Step 1: Back up distribution list: 
+1.       Enter the alias of your DL. 
+2.       Click Create backup. 
+3.       The backup will be created in a folder named “Output”, which you’ll find in the same folder that you launched the Hummingbird tool from.  
+ 
+Create a group from the backup of your DL                                 
+On the Distribution List tab, under Step 2: Create group from distribution list backup: 
+1.       Browse for the backup file, select it, and then click Open.  
+2.       The group alias will be prepopulated. The alias can’t be the same as the DL alias, so you’ll need to modify it.  The indicator next to the Group alias box will show whether the alias is available. If the alias isn’t available, type a new one. 
+3.       If you want to verify that all members of the DL have been included in the group, click View members. 
+4.       Click Create group.  
+
+If your group was created but you get an error 
+1.       If you receive an error message that says “The group was created, but not all the members were added. Please go to “Bulk add” to add the missing members using the original backup and the following group address {0}.”, this means that member addition failed. As the error says, go to the Bulk add tab and follow the steps to bulk add members using the group address listed in the error message.   
+2.       If you receive an error message that says “The group was created but invalid members weren’t added.” this means that people who are no longer part of your organization weren’t added to the group. A list of these users is included in the file <DLalias>_Create_Failures.xmldl. 
+Bulk add members 
+On the Bulk add tab: 
+1.       Under Add DL users to group > DL backup, click Browse. 
+2.       Select the backup file for your DL. 
+3.       Under Group SMTP address, enter the SMTP address of your Office 365 group. If you don't remember your group address, go to the file “DLtoGroupMapping.xmldl” to find it. 
+4.       Click Add members. 
+5.       If you get the error message “The bulk add was partially successful. Number of members added successfully: {0} Number of members not added: {0} Number of invalid members: {0}”, you’ll find a list of members who weren’t added and invalid members in the file <DLalias>_AddMember_Failures.xmldl .  If you continue to see this error, please try again later. 
+Enabling people to send email to the group at the original DL address 
+Before people can use the DL address to send email to the group, you need to either delete the DL or rename it.  
+·         Delete the DL using the same tool that was used to create it in your organization.  
+·         Rename the DL using PowerShell. The benefit from using PowerShell is that you’ll know right away that the name was changed. 
+Whether you delete the DL or rename it, there will be a period of downtime—up to 24 hours—before the migration is complete, during which people won’t be able to communicate with the DL. This happens because the address needs to be updated in all databases before it’s available for reuse. After the downtime, you’ll need to assign the SMTP address of the DL to the group (Step 5 below). Once this is complete, email sent to the DL will go to the group. 
+Follow these steps to complete the migration and let users send email to the group at the original DL address:  
+1.	On the Bulk add tab under Back up group member list, back up your distribution list (SMTP – <DLalias@contoso.com>) and create a group that includes all members of the DL. For example, the group’s address might be <group1@contoso.com>. 
+2.	Rename the SMTP address of the DL with a dummy value (Step 3), or delete the DL (Step 4). 
+3.	Rename the SMTP address of the DL using the following steps:  
+1.	Set-DistributionGroup <Identity parameter of DL> – EmailAddresses “SMTP:dummyDLalias@contoso.com” 
+2.	If there are multiple email addresses, decide which one to retain and which one to give to the group and make changes accordingly. 
+3.	If this is an on-premises DL, wait for the DL update to be available in the cloud, which should take approximately 4-6 hours. In some situations, it can take up to 24 hours. 
+4.	If you’re in Outlook on the web (OWA) pointing to the cloud, try to forcefully resolve the alias by typing the email address in the browser and pressing Ctrl+K. Then check to see if the DL has been migrated.  
+4.	Delete the DL using the tool that was used to create it or via PowerShell (for example, Remove-DistributionGroup <Identity parameter of the DL>). 
+5.	Assign the SMTP address of the DL to the group using the following commands: 
+$ug = Get-UnifiedGroup <SMTP: group1@contoso.com>. This will get the group details. 
+ 
+$addr = '"' + ($ug.EmailAddresses -join '","' ) + '"' 
+ 
+$addr = $addr.Replace("SMTP","smtp") 
+ 
+This will get all the email addresses of the group in $addr. 
+ 
+$NewSmtps = '"SMTP:<DLalias>@contoso.com",' + $addr 
+ 
+This command will add the DL’s SMTP address to the address list. 
+ 
+Set-UnifiedGroup <Identity parameter of the Group> –EmailAddresses $NewSmtps 
+ 
+This command will assign the DL address to the group. The old group address will become the secondary address. 
+ 
+6.	If the group has more than 5,000 members or if the DL had sender restrictions set, you need to set sender restrictions on the group. 
+ 
+For example, if member count > 5,000 and if you want to allow only members of the group to send email to the group, use the following command: 
+ 
+Set-UnifiedGroup < Identity parameter of the Group >  
+ 
+-AcceptMessagesOnlyFromSendersOrMembers <Group SMTP address> 
+7.	Check that email is being delivered to the group mailbox and the group members. 
+8.	Delete the DL (if you haven’t already) once the migration is successful and all issues with group are resolved.
